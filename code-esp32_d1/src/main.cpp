@@ -1,18 +1,32 @@
 #include <Arduino.h>
+#include <ps5Controller.h>
+#include <p2os.hpp>
+#include <HardwareSerial.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#define PIONEER_SERIAL_RX 16
+#define PIONEER_SERIAL_TX 17
+
+HardwareSerial debug_serial(0); // define a Serial for UART0
+HardwareSerial pioneer_serial(2); // define a Serial for UART2
+
+P2OSCommunication* p2os_communication;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  debug_serial.begin(9600);
+  
+  pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
+  debug_serial.println("Leets go!");
+  
+  p2os_communication = new P2OSCommunication(
+    debug_serial,
+    pioneer_serial
+  );
+
+  p2os_communication->Setup();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // debug_serial.println("Loop!");
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
+
