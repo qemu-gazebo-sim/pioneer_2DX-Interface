@@ -22,7 +22,7 @@ class P2OSPacket {
     ~P2OSPacket();
 
     void set_pioneer_serial(HardwareSerial& pioneer_serial);
-
+    
   public:
     unsigned char packet[packet_len];
     unsigned char size;

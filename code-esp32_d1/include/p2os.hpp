@@ -15,7 +15,13 @@ class P2OSCommunication {
     private:
         HardwareSerial* debug_serial;
         HardwareSerial* pioneer_serial;
-
+        int motor_max_speed;
+        int motor_max_turnspeed;
+        int16_t motor_max_trans_accel;
+        int16_t motor_max_trans_decel;
+        int16_t motor_max_rot_accel;
+        int16_t motor_max_rot_decel;
+        // SIP * sippacket;
     public:
         P2OSCommunication(
             HardwareSerial& debug_serial, 
@@ -45,6 +51,7 @@ class P2OSCommunication {
         // diagnostic messages
         //   void check_voltage(diagnostic_updater::DiagnosticStatusWrapper & stat);
         //   void check_stall(diagnostic_updater::DiagnosticStatusWrapper & stat);
+        void ToggleSonarPower(unsigned char val);
 
     protected:
         std::string psos_serial_port;
@@ -67,19 +74,6 @@ class P2OSCommunication {
         //! Control wheel velocities individually?
         int direct_wheel_vel_control;
         int radio_modemp;
-
-        //! Maximum motor speed in Meters per second.
-        int motor_max_speed;
-        //! Maximum turn speed in radians per second.
-        int motor_max_turnspeed;
-        //! Maximum translational acceleration in Meters per second per second.
-        int16_t motor_max_trans_accel;
-        //! Minimum translational acceleration in Meters per second per second.
-        int16_t motor_max_trans_decel;
-        //! Maximum rotational acceleration in radians per second per second.
-        int16_t motor_max_rot_accel;
-        //! Minimum rotational acceleration in Meters per second per second.
-        int16_t motor_max_rot_decel;
         //! Pulse time
         double pulse;
         double desired_freq;

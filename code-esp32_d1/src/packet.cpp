@@ -68,7 +68,7 @@ int P2OSPacket::CalcChkSum() {
 }
 
 int P2OSPacket::Receive() {
-  this->debug_serial->println("Receive 0");
+  // this->debug_serial->println("Receive 0");
   unsigned char prefix[3];
   int cnt;
 
@@ -76,51 +76,47 @@ int P2OSPacket::Receive() {
 
   do {
     ::memset(prefix, 0, sizeof(prefix));
-    this->debug_serial->println("Receive 1");
 
-    int retries_0 = 20; 
-    while (retries_0 > 0) {
+    int retries_0 = 100; 
+    while (1) {
       cnt = 0;
-      this->debug_serial->println("Receive 2");
+      // this->debug_serial->println("Receive 2");
       int retries_1 = 20; 
-
-      
+      uint8_t read_value;
+      int read_result;
       while (cnt != 1 && retries_1 > 0) {
-
-        // if (this->pioneer_serial->available() > 0) {
-        //   int readValue = this->pioneer_serial->read();
-        //   // Read the value into the prefix array starting from the third position
-        //   prefix[2] = (char)readValue;
-        //   cnt++;
-        // }
-
-        int read_result = this->pioneer_serial->read(&prefix[2], 1);
-        cnt += read_result;
-        if (cnt < 0) {
-          this->debug_serial->printf("Error: error reading packet.header from robot connection: P2OSPacket():Receive():read():\n");
-          return 1;
-        }
-
-        if (prefix[2] == 0 || prefix[2] == 255) {
+        if (this->pioneer_serial->available()) {
+          read_result = this->pioneer_serial->read(&prefix[2], 1);
+          cnt += read_result;
+          if (cnt < 0) {
+            this->debug_serial->printf("Error: error reading packet.header from robot connection: P2OSPacket():Receive():read():\n");
+            return 1;
+          }
+        } else {
+          retries_1--;
           cnt = 0;
+          if (retries_1 < 1) {
+            this->debug_serial->printf("Error: timout reading packet.header from robot connection: P2OSPacket():Receive():read():\n");
+            return 1;
+          }
         }
         // this->debug_serial->printf("%i \n", read_result);
-        // retries_1--;
       }
-      this->debug_serial->printf("%i \n", prefix[2]);
-      this->debug_serial->println("Receive 3");
+
+      // this->debug_serial->printf("%i", prefix[2]);
+      // this->debug_serial->println("Receive 3");
       if (prefix[0] == 0xFA && prefix[1] == 0xFB) {
         break;
       }
-
-      // timestamp = ros::Time::now();
-      // GlobalTime->GetTimeDouble(&timestamp);
-
       prefix[0] = prefix[1];
       prefix[1] = prefix[2];
       // skipped++;
 
-      // retries_0--;
+      retries_0--;
+      if (retries_0 < 0) {
+          this->debug_serial->printf("Error: timout retried: P2OSPacket():Receive():read():\n");
+          return 1;
+      }
     }
     // // if (skipped>3) ROS_INFO("Skipped %d bytes\n", skipped);
 
@@ -129,19 +125,25 @@ int P2OSPacket::Receive() {
 
     cnt = 0;
     while (cnt != prefix[2]) {
-      int read_result = this->pioneer_serial->read(
-        &packet[3 + cnt], 
-        prefix[2] - cnt
-      );
-      cnt += read_result;
+      if (this->pioneer_serial->available()) {
+        int read_result = this->pioneer_serial->read(
+          &packet[3 + cnt], 
+          prefix[2] - cnt
+        );
+        cnt += read_result;
 
-      if (cnt < 0) {
-        this->debug_serial->printf(
-          "Error reading packet body from robot connection: P2OSPacket():Receive():read():\n");
-        return 1;
+        if (cnt < 0) {
+          this->debug_serial->printf(
+            "Error reading packet body from robot connection: P2OSPacket():Receive():read():\n");
+          return 1;
+        }
+      } else {
+        this->debug_serial->printf("Error: reading packet.body from robot connection: P2OSPacket():Receive():read():\n");
       }
     }
-    this->debug_serial->println("Receive 4");
+    // this->debug_serial->println("Receive 4");
+    this->debug_serial->println("Received: ");
+    this->Print();
   } while (!Check());
 
   return 0;
@@ -182,13 +184,20 @@ int P2OSPacket::Send() {
   int cnt = 0;
 
   while (cnt != this->size) {
-    int read_result = this->pioneer_serial->write(this->packet, this->size);
-    cnt += read_result;
-    if (cnt < 0) {
-      this->debug_serial->printf("Error: Send \n");
-      return 1;
+    if (this->pioneer_serial->availableForWrite()) {
+      int read_result = this->pioneer_serial->write(this->packet, this->size);
+      cnt += read_result;
+      if (cnt < 0) {
+        this->debug_serial->println("Error: Send");
+        return 1;
+      }
+    } else {
+      this->debug_serial->println("Not available to write");
     }
   }
+  this->pioneer_serial->flush(true);
+  
+  this->debug_serial->println("Sent: ");
   this->Print();
   return 0;
 }
