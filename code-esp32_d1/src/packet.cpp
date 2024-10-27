@@ -81,8 +81,7 @@ int P2OSPacket::Receive() {
     while (1) {
       cnt = 0;
       // this->debug_serial->println("Receive 2");
-      int retries_1 = 20; 
-      uint8_t read_value;
+      int retries_1 = 50; 
       int read_result;
       while (cnt != 1 && retries_1 > 0) {
         if (this->pioneer_serial->available()) {
@@ -142,7 +141,7 @@ int P2OSPacket::Receive() {
       }
     }
     // this->debug_serial->println("Receive 4");
-    this->debug_serial->println("Received: ");
+    this->debug_serial->println("Received:");
     this->Print();
   } while (!Check());
 
@@ -197,7 +196,7 @@ int P2OSPacket::Send() {
   }
   this->pioneer_serial->flush(true);
   
-  this->debug_serial->println("Sent: ");
+  this->debug_serial->println("Sent:");
   this->Print();
   return 0;
 }

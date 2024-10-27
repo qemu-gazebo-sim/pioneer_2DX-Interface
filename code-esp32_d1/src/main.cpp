@@ -13,8 +13,10 @@ P2OSCommunication* p2os_communication;
 
 void setup() {
   debug_serial.begin(9600);
-  
+  debug_serial.flush();
   pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
+  pioneer_serial.flush();
+  
   debug_serial.println("Leets go!");
   
   p2os_communication = new P2OSCommunication(
