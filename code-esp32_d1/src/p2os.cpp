@@ -47,6 +47,84 @@ P2OSCommunication::P2OSCommunication(HardwareSerial& debug_serial, HardwareSeria
 
 P2OSCommunication::~P2OSCommunication() { /** Destructor **/}
 
+void P2OSCommunication::check_and_set_motor_state() {
+    // if (!motor_dirty) {
+    //     return;
+    // }
+    motor_dirty = false;
+
+    unsigned char val = 1;//static_cast<unsigned char>(cmdmotor_state_.state);
+    unsigned char command[4];
+    // P2OSPacket packet;
+    P2OSPacket* packet = new P2OSPacket(
+        *(this->debug_serial),
+        *(this->pioneer_serial)
+    );
+    command[0] = ENABLE;
+    command[1] = ARGINT;
+    command[2] = val;
+    command[3] = 0;
+    packet->Build(command, 4);
+
+    // Store the current motor state so that we can set it back
+    // p2os_data.motors.state = cmdmotor_state_.state;
+    SendReceive(packet, false);
+    delete packet;
+}
+
+void P2OSCommunication::check_and_set_vel(int lin_vel, int ang_vel) {
+    //   if (!vel_dirty) {return;}
+
+    //   ROS_DEBUG("setting vel: [%0.2f,%0.2f]", cmdvel_.linear.x, cmdvel_.angular.z);
+    vel_dirty = false;
+
+    uint16_t absSpeedDemand, absturnRateDemand;
+    unsigned char motorcommand[4];
+    P2OSPacket* motorpacket = new P2OSPacket(
+        *(this->debug_serial),
+        *(this->pioneer_serial)
+    );
+
+    int vx = lin_vel; // static_cast<int>(cmdvel_.linear.x * 1e3);
+    int va = ang_vel; // static_cast<int>(rint(RTOD(cmdvel_.angular.z)));
+
+    // non-direct wheel control
+    motorcommand[0] = VEL;
+    motorcommand[1] = (vx >= 0) ? ARGINT : ARGNINT;
+
+    absSpeedDemand = static_cast<uint16_t>(abs(vx));
+
+    if (absSpeedDemand <= this->motor_max_speed) {
+        motorcommand[2] = absSpeedDemand & 0x00FF;
+        motorcommand[3] = (absSpeedDemand & 0xFF00) >> 8;
+    } else {
+        this->debug_serial->printf("speed demand thresholded! (true: %u, max: %u)\n", absSpeedDemand, motor_max_speed);
+        motorcommand[2] = motor_max_speed & 0x00FF;
+        motorcommand[3] = (motor_max_speed & 0xFF00) >> 8;
+    }
+
+    motorpacket->Build(motorcommand, 4);
+    SendReceive(motorpacket);
+
+    motorcommand[0] = RVEL;
+    motorcommand[1] = (va >= 0) ? ARGINT : ARGNINT;
+
+    absturnRateDemand = static_cast<uint16_t>((va >= 0) ? va : (-1 * va));
+
+    if (absturnRateDemand <= motor_max_turnspeed) {
+        motorcommand[2] = absturnRateDemand & 0x00FF;
+        motorcommand[3] = (absturnRateDemand & 0xFF00) >> 8;
+    } else {
+        this->debug_serial->printf("Turn rate demand threshholded!\n");
+        motorcommand[2] = this->motor_max_turnspeed & 0x00FF;
+        motorcommand[3] = (this->motor_max_turnspeed & 0xFF00) >> 8;
+    }
+
+    motorpacket->Build(motorcommand, 4);
+    SendReceive(motorpacket);
+    delete motorpacket;
+}
+
 int P2OSCommunication::Setup() {
     int i;
     unsigned long bauds[] = {9600, 38400, 19200, 115200, 57600};
@@ -247,7 +325,7 @@ int P2OSCommunication::Setup() {
     //     SendReceive((P2OSPacket*)NULL,false);
     // */
     // turn off the sonars at first
-    this->ToggleSonarPower(0);
+    // this->ToggleSonarPower(0);
     P2OSPacket* accel_packet = new P2OSPacket(
         *(this->debug_serial),
         *(this->pioneer_serial)
@@ -259,6 +337,7 @@ int P2OSCommunication::Setup() {
         accel_command[2] = this->motor_max_trans_accel & 0x00FF;
         accel_command[3] = (this->motor_max_trans_accel & 0xFF00) >> 8;
         accel_packet->Build(accel_command, 4);
+        // accel_packet->Send();
         this->SendReceive(accel_packet, false);
     }
 
@@ -288,6 +367,7 @@ int P2OSCommunication::Setup() {
         accel_packet->Build(accel_command, 4);
         this->SendReceive(accel_packet, false);
     }
+    delete accel_packet;
 
     // if requested, change PID settings
     P2OSPacket* pid_packet = new P2OSPacket(
@@ -348,13 +428,9 @@ int P2OSCommunication::Setup() {
         pid_packet->Build(pid_command, 4);
         this->SendReceive(pid_packet);
     }
+    delete pid_packet;
 
-    while(1){
-        command = PULSE;
-        packet->Build(&command, 1);
-        packet->Send();
-        delay(200);
-    }
+    return 0;
 }
 
 int P2OSCommunication::Shutdown() {
@@ -390,6 +466,7 @@ int P2OSCommunication::Shutdown() {
     // delete this->sippacket;
     // this->sippacket = NULL;
 
+    delete packet_shutdown;
     return 0;
 }
 
@@ -455,7 +532,8 @@ int P2OSCommunication::SendReceive(
     }
 //   }
 
-  return 0;
+    delete packet_send_recieve;
+    return 0;
 }
 
 void P2OSCommunication::ToggleSonarPower(unsigned char val) {
@@ -472,4 +550,48 @@ void P2OSCommunication::ToggleSonarPower(unsigned char val) {
     command[3] = 0;
     sonar_power_packet->Build(command, 4);
     SendReceive(sonar_power_packet, false);
+
+    delete sonar_power_packet;
+}
+
+/*! \brief Toggle motors on/off.
+ *
+ *  Turn on/off the robots in accordance to val.
+ *  @param val Determines what state the motor should be. 1 = enabled, 0 = disabled.
+ */
+void P2OSCommunication::ToggleMotorPower(unsigned char val) {
+    unsigned char command[4];
+    P2OSPacket* toggle_motor_power = new P2OSPacket(
+        *(this->debug_serial),
+        *(this->pioneer_serial)
+    );
+    // this->debug_serial->printf("motor state: %d\n", p2os_data.motors.state);
+    // p2os_data.motors.state = static_cast<int>(val);
+    this->debug_serial->printf("motor state: %d\n", val);
+    command[0] = ENABLE;
+    command[1] = ARGINT;
+    command[2] = val;
+    command[3] = 0;
+    toggle_motor_power->Build(command, 4);
+    SendReceive(toggle_motor_power, false);
+
+    delete toggle_motor_power;
+}
+
+/////////////////////////////////////////////////////
+//  Actarray stuff
+/////////////////////////////////////////////////////
+
+void P2OSCommunication::SendPulse(void) {
+    unsigned char command;
+    P2OSPacket* send_pulse_packet = new P2OSPacket(
+        *(this->debug_serial),
+        *(this->pioneer_serial)
+    );
+
+    command = PULSE;
+    send_pulse_packet->Build(&command, 1);
+    SendReceive(send_pulse_packet);
+
+    delete send_pulse_packet;
 }

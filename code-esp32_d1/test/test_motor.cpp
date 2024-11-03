@@ -53,6 +53,3 @@ void loop() {
     last_time_vel = current_time;
   }
 }
-
-
-

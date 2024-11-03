@@ -42,7 +42,7 @@ class P2OSCommunication {
 
         void SendPulse(void);
 
-        void check_and_set_vel();
+        void check_and_set_vel(int lin_vel, int ang_vel);
         //   void cmdvel_cb(const geometry_msgs::TwistConstPtr &);
 
         void check_and_set_motor_state();
@@ -52,6 +52,7 @@ class P2OSCommunication {
         //   void check_voltage(diagnostic_updater::DiagnosticStatusWrapper & stat);
         //   void check_stall(diagnostic_updater::DiagnosticStatusWrapper & stat);
         void ToggleSonarPower(unsigned char val);
+        void ToggleMotorPower(unsigned char val);
 
     protected:
         std::string psos_serial_port;

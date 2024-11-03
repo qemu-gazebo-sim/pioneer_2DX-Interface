@@ -92,7 +92,7 @@ int P2OSPacket::Receive() {
             return 1;
           }
         } else {
-          retries_1--;
+          // retries_1--;
           cnt = 0;
           if (retries_1 < 1) {
             this->debug_serial->printf("Error: timout reading packet.header from robot connection: P2OSPacket():Receive():read():\n");
