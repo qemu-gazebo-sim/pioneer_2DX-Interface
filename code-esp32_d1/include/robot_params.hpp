@@ -7,7 +7,7 @@
 void initialize_robot_params(void);
 
 
-#define PLAYER_NUM_ROBOT_TYPES 30
+#define PLAYER_NUM_ROBOT_TYPES 1
 
 // Default max speeds
 #define MOTOR_DEF_MAX_SPEED 0.5
@@ -147,27 +147,27 @@ enum P2OSCommand {
 #define ARGSTR    0x2B  // String (Note: 1st byte is length!!)
 
 /* gripper stuff */
-#define GRIPopen   1
-#define GRIPclose  2
-#define GRIPstop   3
-#define LIFTup     4
-#define LIFTdown   5
-#define LIFTstop   6
-#define GRIPstore  7
-#define GRIPdeploy 8
-#define GRIPhalt   15
-#define GRIPpress  16
-#define LIFTcarry  17
+// #define GRIPopen   1
+// #define GRIPclose  2
+// #define GRIPstop   3
+// #define LIFTup     4
+// #define LIFTdown   5
+// #define LIFTstop   6
+// #define GRIPstore  7
+// #define GRIPdeploy 8
+// #define GRIPhalt   15
+// #define GRIPpress  16
+// #define LIFTcarry  17
 
 /* CMUcam stuff */
-#define CMUCAM_IMAGE_WIDTH  80
-#define CMUCAM_IMAGE_HEIGHT 143
-#define CMUCAM_MESSAGE_LEN  10
+// #define CMUCAM_IMAGE_WIDTH  80
+// #define CMUCAM_IMAGE_HEIGHT 143
+// #define CMUCAM_MESSAGE_LEN  10
 
 /* conection stuff */
-#define DEFAULT_P2OS_PORT "/dev/ttyS0"
-#define DEFAULT_P2OS_TCP_REMOTE_HOST "localhost"
-#define DEFAULT_P2OS_TCP_REMOTE_PORT 8101
+// #define DEFAULT_P2OS_PORT "/dev/ttyS0"
+// #define DEFAULT_P2OS_TCP_REMOTE_HOST "localhost"
+// #define DEFAULT_P2OS_TCP_REMOTE_PORT 8101
 
 /* degrees and radians */
 #define DTOR(a) M_PI * a / 180.0

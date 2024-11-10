@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <Arduino.h>
-
+#include "p2os_config.hpp"
 #include <packet.hpp>
 
 P2OSPacket::P2OSPacket(
@@ -22,21 +22,26 @@ void P2OSPacket::set_pioneer_serial(HardwareSerial& pioneer_serial) {
 }
 
 void P2OSPacket::Print() {
+  #if DEBUG_PRINT
   if (this->packet) {
     for (int i = 0; i < this->size; i++) {
       this->debug_serial->printf("%u ", packet[i]);
     }
     this->debug_serial->printf("\n");
   }
+  #endif
 }
 
 void P2OSPacket::PrintHex() {
+  #if DEBUG_PRINT
   if (this->packet) {
     for (int i = 0; i < this->size; i++) {
      this->debug_serial->printf("0x%.2x ", packet[i]);
     }
    this->debug_serial->printf("\n");
   }
+  #endif
+
 }
 
 bool P2OSPacket::Check() {
@@ -68,7 +73,6 @@ int P2OSPacket::CalcChkSum() {
 }
 
 int P2OSPacket::Receive() {
-  // this->debug_serial->println("Receive 0");
   unsigned char prefix[3];
   int cnt;
 
@@ -80,7 +84,6 @@ int P2OSPacket::Receive() {
     int retries_0 = 100; 
     while (1) {
       cnt = 0;
-      // this->debug_serial->println("Receive 2");
       int retries_1 = 50; 
       int read_result;
       while (cnt != 1 && retries_1 > 0) {
@@ -88,14 +91,18 @@ int P2OSPacket::Receive() {
           read_result = this->pioneer_serial->read(&prefix[2], 1);
           cnt += read_result;
           if (cnt < 0) {
+            #if ERROR_PRINT
             this->debug_serial->printf("Error: error reading packet.header from robot connection: P2OSPacket():Receive():read():\n");
+            #endif
             return 1;
           }
         } else {
           // retries_1--;
           cnt = 0;
           if (retries_1 < 1) {
+            #if ERROR_PRINT
             this->debug_serial->printf("Error: timout reading packet.header from robot connection: P2OSPacket():Receive():read():\n");
+            #endif
             return 1;
           }
         }
@@ -113,7 +120,9 @@ int P2OSPacket::Receive() {
 
       retries_0--;
       if (retries_0 < 0) {
+          #if ERROR_PRINT
           this->debug_serial->printf("Error: timout retried: P2OSPacket():Receive():read():\n");
+          #endif
           return 1;
       }
     }
@@ -132,17 +141,23 @@ int P2OSPacket::Receive() {
         cnt += read_result;
 
         if (cnt < 0) {
+          #if ERROR_PRINT
           this->debug_serial->printf(
             "Error reading packet body from robot connection: P2OSPacket():Receive():read():\n");
+          #endif
           return 1;
         }
       } else {
+        #if ERROR_PRINT
         this->debug_serial->printf("Error: reading packet.body from robot connection: P2OSPacket():Receive():read():\n");
+        #endif
       }
     }
     // this->debug_serial->println("Receive 4");
+    #if DEBUG_PRINT
     this->debug_serial->println("Received:");
-    this->Print();
+    this->PrintHex();
+    #endif
   } while (!Check());
 
   return 0;
@@ -161,7 +176,9 @@ int P2OSPacket::Build(
   this->packet[1] = 0xFB;
 
   if (this->size > 198) {
+    #if ERROR_PRINT
     this->debug_serial->printf("Error: Packet to P2OS can't be larger than 200 bytes\n");
+    #endif
     return 1;
   }
   this->packet[2] = datasize + 2;
@@ -173,7 +190,9 @@ int P2OSPacket::Build(
   this->packet[3 + datasize + 1] = chksum & 0xFF;
 
   if (!Check()) {
+    #if ERROR_PRINT
     this->debug_serial->printf("Error: DAMN\n");
+    #endif
     return 1;
   }
   return 0;
@@ -187,16 +206,22 @@ int P2OSPacket::Send() {
       int read_result = this->pioneer_serial->write(this->packet, this->size);
       cnt += read_result;
       if (cnt < 0) {
+        #if ERROR_PRINT
         this->debug_serial->println("Error: Send");
+        #endif
         return 1;
       }
     } else {
+      #if DEBUG_PRINT
       this->debug_serial->println("Not available to write");
+      #endif
     }
   }
   this->pioneer_serial->flush(true);
   
+  #if DEBUG_PRINT
   this->debug_serial->println("Sent:");
   this->Print();
+  #endif
   return 0;
 }

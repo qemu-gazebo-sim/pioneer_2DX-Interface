@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <ps5Controller.h>
 #include <p2os.hpp>
 #include <HardwareSerial.h>
 
@@ -52,4 +51,6 @@ void loop() {
   } else {
     last_time_vel = current_time;
   }
+
+  delay(500);
 }

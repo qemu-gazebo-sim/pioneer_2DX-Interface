@@ -3,13 +3,13 @@
 #ifndef _P2OS_HPP_
 #define _P2OS_HPP_
 
-#include <iostream>
 #include <cstring>
 #include <string>
 #include <packet.hpp>
 #include <Arduino.h>
-
+#include <p2os_msgs.hpp>
 #include <robot_params.hpp>
+#include "sip.hpp"
 
 class P2OSCommunication {
     private:
@@ -21,8 +21,11 @@ class P2OSCommunication {
         int16_t motor_max_trans_decel;
         int16_t motor_max_rot_accel;
         int16_t motor_max_rot_decel;
-        // SIP * sippacket;
+
     public:
+        SIP * sippacket;
+        nav_msgs::ros_p2os_data_t p2os_data;
+
         P2OSCommunication(
             HardwareSerial& debug_serial, 
             HardwareSerial& pioneer_serial
@@ -59,7 +62,7 @@ class P2OSCommunication {
         std::string psos_tcp_host;
         std::string odom_frame_id;
         std::string base_link_frame_id;
-        int psos_fd;
+        // int psos_fd;
         bool psos_use_tcp;
         int psos_tcp_port;
         bool vel_dirty, motor_dirty;
@@ -71,17 +74,17 @@ class P2OSCommunication {
         //! Stall I hit a wall?
         int bumpstall;   // should we change the bumper-stall behavior?
         //! Use Joystick?
-        int joystick;
+        // int joystick;
         //! Control wheel velocities individually?
         int direct_wheel_vel_control;
-        int radio_modemp;
+        // int radio_modemp;
         //! Pulse time
-        double pulse;
-        double desired_freq;
+        // double pulse;
+        // double desired_freq;
         //! Last time the node received or sent a pulse.
-        double lastPulseTime;
+        // double lastPulseTime;
         //! Use the sonar array?
-        bool use_sonar_;
+        // bool use_sonar_;
 
 };
 
