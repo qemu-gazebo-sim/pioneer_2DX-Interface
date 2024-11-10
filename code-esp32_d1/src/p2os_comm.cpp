@@ -1,6 +1,4 @@
-/**  P2OS for Arduino **/
-
-#include <p2os.hpp>
+#include <p2os_comm.hpp>
 #include <Arduino.h>
 #include "p2os_config.hpp"
 

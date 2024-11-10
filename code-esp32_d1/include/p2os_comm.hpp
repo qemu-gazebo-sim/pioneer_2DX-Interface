@@ -1,8 +1,5 @@
-/**  P2OS for Arduino **/
-
-#ifndef _P2OS_HPP_
-#define _P2OS_HPP_
-
+#ifndef _P2OS_COMM_HPP_
+#define _P2OS_COMM_HPP_
 
 #include <Arduino.h>
 #include "packet.hpp"
@@ -87,4 +84,4 @@ class P2OSCommunication {
 
 };
 
-#endif  // _P2OS_HPP_
+#endif  // _P2OS_COMM_HPP_
