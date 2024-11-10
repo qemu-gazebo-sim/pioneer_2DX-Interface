@@ -1,9 +1,6 @@
 #ifndef _SIP_HPP_
 #define _SIP_HPP_
 
-#include <climits>
-#include <cstdint>
-#include <string>
 #include <p2os_msgs.hpp>
 
 typedef struct ArmJoint {

@@ -5,7 +5,6 @@
 
 #define PIONEER_SERIAL_RX 16
 #define PIONEER_SERIAL_TX 17
-#define DEBUG_PRINT 0  // Set to 1 to enable, 0 to disable
 
 HardwareSerial debug_serial(0); // define a Serial for UART0
 HardwareSerial pioneer_serial(2); // define a Serial for UART2

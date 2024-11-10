@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <limits.h>
-#include <math.h>  /* rint(3) */
-#include <sys/types.h>
-#include <stdlib.h> /* for abs() */
-#include <unistd.h>
-
 #include <sip.hpp>
-#include <sstream>
 #include <robot_params.hpp>
 #include "p2os_config.hpp"
 
@@ -220,38 +212,41 @@ void SIP::Print() {
     
     this->debug_serial->printf("debug: lwstall:%d rwstall:%d\n", lwstall, rwstall);
 
-    std::stringstream front_bumper_info;
+    String front_bumper_info = "";
     for (int i = 0; i < 5; i++) {
-        front_bumper_info << " " <<
-        static_cast<int>((frontbumpers >> i) & 0x01 );
+      front_bumper_info += " ";
+      front_bumper_info += String((frontbumpers >> i) & 0x01);
+        // front_bumper_info << " " <<
+        // static_cast<int>((frontbumpers >> i) & 0x01 );
     }
-    this->debug_serial->printf("debug: Front bumpers:%s\n", front_bumper_info.str().c_str());
-    std::stringstream rear_bumper_info;
+    this->debug_serial->printf("debug: Front bumpers:%s\n", front_bumper_info.c_str());
+    
+    String rear_bumper_info = "";
     for (int i = 0; i < 5; i++) {
-        rear_bumper_info << " " <<
-        static_cast<int>((rearbumpers >> i) & 0x01 );
+      rear_bumper_info += " ";
+      rear_bumper_info += String((rearbumpers >> i) & 0x01);
     }
-    this->debug_serial->printf("debug: Rear bumpers:%s\n", rear_bumper_info.str().c_str());
+    this->debug_serial->printf("debug: Rear bumpers:%s\n", rear_bumper_info.c_str());
 
     this->debug_serial->printf("debug: status: 0x%x analog: %d param_id: %d ", status, analog, param_idx);
-    std::stringstream status_info;
+    String status_info = "";
     for (i = 0; i < 11; i++) {
-        status_info << " " <<
-        static_cast<int>((status >> (7 - i) ) & 0x01);
+        status_info += " ";
+        status_info += String((status >> (7 - i) ) & 0x01);
     }
-    this->debug_serial->printf("debug: status:%s\n", status_info.str().c_str());
-    std::stringstream digin_info;
+    this->debug_serial->printf("debug: status:%s\n", status_info.c_str());
+    String digin_info = "";
     for (i = 0; i < 8; i++) {
-        digin_info << " " <<
-        static_cast<int>((digin >> (7 - i) ) & 0x01);
+        digin_info += " ";
+        digin_info += String((digin >> (7 - i) ) & 0x01);
     }
-    this->debug_serial->printf("debug: digin:%s\n", digin_info.str().c_str());
-    std::stringstream digout_info;
+    this->debug_serial->printf("debug: digin:%s\n", digin_info.c_str());
+    String digout_info = "";
     for (i = 0; i < 8; i++) {
-        digout_info << " " <<
-        static_cast<int>((digout >> (7 - i) ) & 0x01);
+        digout_info += " ";
+        digout_info += String((digout >> (7 - i) ) & 0x01);
     }
-    this->debug_serial->printf("debug: digout:%s\n", digout_info.str().c_str());
+    this->debug_serial->printf("debug: digout:%s\n", digout_info.c_str());
     this->debug_serial->printf("debug: battery: %d compass: %d sonarreadings: %d\n", battery,
         compass, sonarreadings);
     this->debug_serial->printf("debug: xpos: %d ypos:%d ptu:%hu timer:%hu\n", xpos, ypos, ptu, timer);
@@ -269,11 +264,12 @@ void SIP::PrintSonars() {
     if (sonarreadings <= 0) {
         return;
     }
-    std::stringstream sonar_info;
+    String sonar_info;
     for (int i = 0; i < sonarreadings; i++) {
-        sonar_info << " " << static_cast<int>(sonars[i]);
+        sonar_info += " ";
+        sonar_info += static_cast<int>(sonars[i]);
     }
-    this->debug_serial->printf("debug: Sonars: %s\n", sonar_info.str().c_str());
+    this->debug_serial->printf("debug: Sonars: %s\n", sonar_info.c_str());
     #endif
 }
 

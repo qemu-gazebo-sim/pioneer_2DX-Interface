@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <Arduino.h>
 #include "p2os_config.hpp"
 #include <packet.hpp>

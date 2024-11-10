@@ -2,8 +2,6 @@
 #define _P2OS_MSGS_HPP_
 
 #include <Arduino.h>
-#include <string>
-#include <array>
 #include <vector>
 
 namespace p2os_msgs {

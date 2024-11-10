@@ -3,12 +3,11 @@
 #ifndef _P2OS_HPP_
 #define _P2OS_HPP_
 
-#include <cstring>
-#include <string>
-#include <packet.hpp>
+
 #include <Arduino.h>
-#include <p2os_msgs.hpp>
-#include <robot_params.hpp>
+#include "packet.hpp"
+#include "p2os_msgs.hpp"
+#include "robot_params.hpp"
 #include "sip.hpp"
 
 class P2OSCommunication {

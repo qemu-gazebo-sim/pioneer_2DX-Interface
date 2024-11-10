@@ -1,7 +1,6 @@
 #ifndef _PACKET_HPP_
 #define _PACKET_HPP_
 
-#include <cstring>
 #include <Arduino.h>
 
 namespace {
