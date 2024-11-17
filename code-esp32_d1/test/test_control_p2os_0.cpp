@@ -1,6 +1,6 @@
 #include <ps5Controller.h>
 #include <Arduino.h>
-#include <p2os.hpp>
+#include <p2os_comm.hpp>
 #include <HardwareSerial.h>
 
 #define PIONEER_SERIAL_RX 16
@@ -61,7 +61,7 @@ void loop() {
       }
 
       if ((current_time - last_time_vel) > 50) {
-        p2os_communication->check_and_set_motor_state();
+        p2os_communication->send_motor_state(1);
 
         if (ps5.R2()) {
           current_r2_val = ps5.R2Value(); // value 0 - 255
@@ -88,7 +88,7 @@ void loop() {
           current_rs_x_val = 0;
         }
 
-        p2os_communication->check_and_set_vel(
+        p2os_communication->send_vel(
           current_r2_val - current_l2_val, 
           current_rs_x_val
         );

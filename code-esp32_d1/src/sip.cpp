@@ -260,17 +260,15 @@ void SIP::Print() {
 }
 
 void SIP::PrintSonars() {
-    #if DEBUG_PRINT
-    if (sonarreadings <= 0) {
+    if (this->sonarreadings <= 0) {
         return;
     }
     String sonar_info;
-    for (int i = 0; i < sonarreadings; i++) {
+    for (int i = 0; i < this->sonarreadings; i++) {
         sonar_info += " ";
         sonar_info += static_cast<int>(sonars[i]);
     }
     this->debug_serial->printf("debug: Sonars: %s\n", sonar_info.c_str());
-    #endif
 }
 
 void SIP::PrintArm() {

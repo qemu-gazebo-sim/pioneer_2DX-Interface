@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <p2os.hpp>
+#include <p2os_comm.hpp>
 #include <HardwareSerial.h>
 
 #define PIONEER_SERIAL_RX 16
@@ -41,13 +41,13 @@ void loop() {
   }
 
   unsigned long vel_interval = current_time - last_time_vel;
-  p2os_communication->check_and_set_motor_state();
+  p2os_communication->send_motor_state(1);
   if (vel_interval < 10000) {
-    p2os_communication->check_and_set_vel(400, 0);
+    p2os_communication->send_vel(400, 0);
   } else if (vel_interval < 20000) {
-    p2os_communication->check_and_set_vel(100, 0);
+    p2os_communication->send_vel(100, 0);
   } else if (vel_interval < 30000) { 
-    p2os_communication->check_and_set_vel(-400, 0);
+    p2os_communication->send_vel(-400, 0);
   } else {
     last_time_vel = current_time;
   }

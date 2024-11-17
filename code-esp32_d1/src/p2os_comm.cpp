@@ -11,7 +11,7 @@ P2OSCommunication::P2OSCommunication(
     
     // read in config options
     this->bumpstall = -1;   // bumpstall
-    // this->pulse = -1.0;     // pulse
+    this->pulse = -1.0;     // pulse
     this->rot_kp = -1;      // rot_kp
     this->rot_kv = -1;      // rot_kv
     this->rot_ki = -1;      // rot_ki
@@ -48,17 +48,30 @@ P2OSCommunication::P2OSCommunication(
 
 P2OSCommunication::~P2OSCommunication() { /** Destructor **/}
 
-// void P2OSNode::cmdmotor_state(const p2os_msgs::MotorStateConstPtr & msg)
+/* Motor setup*/
+void P2OSCommunication::cmdmotor_state(p2os_msgs::MotorState* msg) {
+  this->motor_dirty = true;
+  this->cmdmotor_state_ = *msg;
+}
 
 void P2OSCommunication::check_and_set_motor_state() {
-    // if (!motor_dirty) {
-    //     return;
-    // }
-    motor_dirty = false;
+    if (!this->motor_dirty) {
+        return;
+    }
+    this->motor_dirty = false;
 
-    unsigned char val = 1;//static_cast<unsigned char>(cmdmotor_state_.state);
+    this->send_motor_state(this->cmdmotor_state_.state);
+}
+
+void P2OSCommunication::send_motor_state(int state) {
+    unsigned char val = static_cast<unsigned char>(state);
     unsigned char command[4];
     // P2OSPacket packet;
+    #if DEBUG_PRINT
+    this->debug_serial->printf(
+        "debug: sending motor state signal (%d)\n", val
+    );
+    #endif
     P2OSPacket* packet = new P2OSPacket(
         *(this->debug_serial),
         *(this->pioneer_serial)
@@ -72,18 +85,65 @@ void P2OSCommunication::check_and_set_motor_state() {
     // // Store the current motor state so that we can set it back
     // p2os_data.motors.state = cmdmotor_state_.state;
     SendReceive(packet, false);
-    delete packet;
+    delete packet;  
 }
 
 // void P2OSNode::check_and_set_gripper_state()
 
-// void P2OSNode::cmdvel_cb(const geometry_msgs::TwistConstPtr & msg)
+/* Velocity setup*/
+void P2OSCommunication::cmdvel_cb(geometry_msgs::Twist* msg) {
+  if (
+    fabs(msg->linear.x - cmdvel_.linear.x) > 0.01 ||
+    fabs(msg->angular.z - cmdvel_.angular.z) > 0.01
+    ) {
+        this->veltime = millis();
+        #if DEBUG_PRINT
+        this->debug_serial->printf(
+            "debug: new speed: [%0.2f,%0.2f](%0.3f)\n", 
+            msg->linear.x * 1e3, 
+            msg->angular.z,
+            this->millis2Sec(this->veltime)
+        );
+        #endif
+        this->vel_dirty = true;
+        this->cmdvel_ = *msg;
+    } else {
+        uint32_t veldur = millis() - this->veltime;
+        if (this->millis2Sec(veldur) > 2.0 &&
+            (
+                (fabs(cmdvel_.linear.x) > 0.01) || (fabs(cmdvel_.angular.z) > 0.01)
+            )
+        ) {
+            #if DEBUG_PRINT
+            this->debug_serial->printf(
+                "debug: maintaining old speed: %0.3f|%0.3f", 
+                this->millis2Sec(this->veltime), 
+                this->millis2Sec(millis())
+            );
+            #endif
+            this->vel_dirty = true;
+            this->veltime = millis();
+        }
+    }
+}
 
-void P2OSCommunication::check_and_set_vel(int lin_vel, int ang_vel) {
-    //   if (!vel_dirty) {return;}
+void P2OSCommunication::check_and_set_vel() {
 
-    //   ROS_DEBUG("setting vel: [%0.2f,%0.2f]", cmdvel_.linear.x, cmdvel_.angular.z);
+    if (!this->vel_dirty) {return;}
+
+    #if DEBUG_PRINT
+    this->debug_serial->printf("debug: setting vel: [%0.2f,%0.2f]\n", cmdvel_.linear.x, cmdvel_.angular.z);
+    #endif
+    
     vel_dirty = false;
+
+    int vx =  static_cast<int>(cmdvel_.linear.x * 1e3); // lin_vel;
+    int va =  static_cast<int>(rint(RTOD(cmdvel_.angular.z))); // ang_vel;
+
+    this->send_vel(vx, va);
+}
+
+void P2OSCommunication::send_vel(int lin_vel, int ang_vel) {
 
     uint16_t absSpeedDemand, absturnRateDemand;
     unsigned char motorcommand[4];
@@ -92,14 +152,11 @@ void P2OSCommunication::check_and_set_vel(int lin_vel, int ang_vel) {
         *(this->pioneer_serial)
     );
 
-    int vx = lin_vel; // static_cast<int>(cmdvel_.linear.x * 1e3);
-    int va = ang_vel; // static_cast<int>(rint(RTOD(cmdvel_.angular.z)));
-
     // non-direct wheel control
     motorcommand[0] = VEL;
-    motorcommand[1] = (vx >= 0) ? ARGINT : ARGNINT;
+    motorcommand[1] = (lin_vel >= 0) ? ARGINT : ARGNINT;
 
-    absSpeedDemand = static_cast<uint16_t>(abs(vx));
+    absSpeedDemand = static_cast<uint16_t>(abs(lin_vel));
 
     if (absSpeedDemand <= this->motor_max_speed) {
         motorcommand[2] = absSpeedDemand & 0x00FF;
@@ -116,9 +173,9 @@ void P2OSCommunication::check_and_set_vel(int lin_vel, int ang_vel) {
     SendReceive(motorpacket);
 
     motorcommand[0] = RVEL;
-    motorcommand[1] = (va >= 0) ? ARGINT : ARGNINT;
+    motorcommand[1] = (ang_vel >= 0) ? ARGINT : ARGNINT;
 
-    absturnRateDemand = static_cast<uint16_t>((va >= 0) ? va : (-1 * va));
+    absturnRateDemand = static_cast<uint16_t>((ang_vel >= 0) ? ang_vel : (-1 * ang_vel));
 
     if (absturnRateDemand <= motor_max_turnspeed) {
         motorcommand[2] = absturnRateDemand & 0x00FF;
@@ -647,4 +704,43 @@ void P2OSCommunication::SendPulse(void) {
     SendReceive(send_pulse_packet);
 
     delete send_pulse_packet;
+}
+
+void P2OSCommunication::ResetRawPositions() {
+
+    P2OSPacket* pkt = new P2OSPacket(
+        *(this->debug_serial),
+        *(this->pioneer_serial)
+    );
+    unsigned char p2oscommand[4];
+
+    if (this->sippacket) {
+        this->sippacket->rawxpos = 0;
+        this->sippacket->rawypos = 0;
+        this->sippacket->xpos = 0;
+        this->sippacket->ypos = 0;
+        p2oscommand[0] = SETO;
+        p2oscommand[1] = ARGINT;
+        pkt->Build(p2oscommand, 2);
+        this->SendReceive(pkt, false);
+
+        #if INFO_PRINT
+        this->debug_serial->println("resetting raw positions");
+        #endif
+
+        delete pkt;
+    }
+}
+
+double P2OSCommunication::get_pulse() {
+    return this->pulse;
+}
+
+double P2OSCommunication::millis2Sec(uint32_t milli_secs) {
+    return double(milli_secs/1000);
+}
+
+void P2OSCommunication::updateDiagnostics()
+{
+//   diagnostic_.update();
 }
