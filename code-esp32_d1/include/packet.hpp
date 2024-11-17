@@ -4,25 +4,21 @@
 #include <Arduino.h>
 
 namespace {
-  constexpr size_t packet_len = 256;
-}
+constexpr size_t packet_len = 256;
+}  // namespace
 
-class P2OSPacket {    
+class P2OSPacket {
+private:
+    HardwareSerial* debug_serial;
+    HardwareSerial* pioneer_serial;
 
-  private:
-      HardwareSerial* debug_serial;
-      HardwareSerial* pioneer_serial;
-
-  public:
-    P2OSPacket(
-        HardwareSerial& debug_serial, 
-        HardwareSerial& pioneer_serial
-    );
+public:
+    P2OSPacket(HardwareSerial& debug_serial, HardwareSerial& pioneer_serial);
     ~P2OSPacket();
 
     void set_pioneer_serial(HardwareSerial& pioneer_serial);
-    
-  public:
+
+public:
     unsigned char packet[packet_len];
     unsigned char size;
 
@@ -30,17 +26,21 @@ class P2OSPacket {
 
     void Print();
     void PrintHex();
-    int Build(unsigned char * data, unsigned char datasize);
-    int Send();
-    int Receive();
+    int  Build(unsigned char* data, unsigned char datasize);
+    int  Send();
+    int  Receive();
     bool Check();
 
     bool operator!=(P2OSPacket p) {
-      if (size != p.size) {return true;}
+        if (size != p.size) {
+            return true;
+        }
 
-      if (memcmp(packet, p.packet, size) != 0) {return true;}
+        if (memcmp(packet, p.packet, size) != 0) {
+            return true;
+        }
 
-      return false;
+        return false;
     }
 };
 

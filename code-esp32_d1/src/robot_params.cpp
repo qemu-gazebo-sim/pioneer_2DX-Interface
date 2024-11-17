@@ -1,6 +1,5 @@
 #include <robot_params.hpp>
 
-
 // RobotParams_t amigo_params = {
 //   0.001534,
 //   "Pioneer",
@@ -646,69 +645,69 @@
 // };
 
 RobotParams_t p2dx_params = {
-  0.001534,
-  "Pioneer",
-  0.0056,
-  0.84,
-  0,
-  1.626,
-  1,
-  1,
-  0,
-  0,
-  0,
-  "",
-  "COM3",
-  0,
-  1,
-  0,
-  17,
-  8,
-  500,
-  2200,
-  0,
-  5,
-  5,
-  0.268,
-  0,
-  0,
-  0,
-  120,
-  511,
-  250,
-  425,
-  0,
-  0,
-  0,
-  1,
-  1,
-  16,
-  "p2dx",
-  38400,
-  0,
-  0,
-  0,
-  0,
-  20,
-  1,
-  {
-    {115, 130, 90},
-    {155, 115, 50},
-    {190, 80, 30},
-    {210, 25, 10},
-    {210, -25, -10},
-    {190, -80, -30},
-    {155, -115, -50},
-    {115, -130, -90},
-    {-115, -130, -90},
-    {-155, -115, -130},
-    {-190, -80, -150},
-    {-210, -25, -170},
-    {-210, 25, 170},
-    {-190, 80, 150},
-    {-155, 115, 130},
-    {-115, 130, 90},
-  }
+    0.001534,
+    "Pioneer",
+    0.0056,
+    0.84,
+    0,
+    1.626,
+    1,
+    1,
+    0,
+    0,
+    0,
+    "",
+    "COM3",
+    0,
+    1,
+    0,
+    17,
+    8,
+    500,
+    2200,
+    0,
+    5,
+    5,
+    0.268,
+    0,
+    0,
+    0,
+    120,
+    511,
+    250,
+    425,
+    0,
+    0,
+    0,
+    1,
+    1,
+    16,
+    "p2dx",
+    38400,
+    0,
+    0,
+    0,
+    0,
+    20,
+    1,
+    {
+        {115, 130, 90},
+        {155, 115, 50},
+        {190, 80, 30},
+        {210, 25, 10},
+        {210, -25, -10},
+        {190, -80, -30},
+        {155, -115, -50},
+        {115, -130, -90},
+        {-115, -130, -90},
+        {-155, -115, -130},
+        {-190, -80, -150},
+        {-210, -25, -170},
+        {-210, 25, 170},
+        {-190, 80, 150},
+        {-155, 115, 130},
+        {-115, 130, 90},
+    }
 };
 
 // RobotParams_t p2it_params = {
@@ -2030,35 +2029,35 @@ RobotParams_t p2dx_params = {
 RobotParams_t PlayerRobotParams[PLAYER_NUM_ROBOT_TYPES];
 
 void initialize_robot_params(void) {
-  PlayerRobotParams[0] = p2dx_params;
-  // PlayerRobotParams[0] = amigo_params;
-  // PlayerRobotParams[1] = p2at_params;
-  // PlayerRobotParams[2] = p2at8plus_params;
-  // PlayerRobotParams[3] = p2at8_params;
-  // PlayerRobotParams[4] = p2ce_params;
-  // PlayerRobotParams[5] = p2d8plus_params;
-  // PlayerRobotParams[6] = p2d8_params;
-  // PlayerRobotParams[7] = p2de_params;
-  // PlayerRobotParams[8] = p2df_params;
-  // PlayerRobotParams[9] = p2dx_params;
-  // PlayerRobotParams[10] = p2it_params;
-  // PlayerRobotParams[11] = p2pb_params;
-  // PlayerRobotParams[12] = p2pp_params;
-  // PlayerRobotParams[13] = p3at_sh_params;
-  // PlayerRobotParams[14] = p3at_params;
-  // PlayerRobotParams[15] = p3atiw_params;
-  // PlayerRobotParams[16] = p3dx_sh_params;
-  // PlayerRobotParams[17] = p3dx_params;
-  // PlayerRobotParams[18] = peoplebot_sh_params;
-  // PlayerRobotParams[19] = perfpbplus_params;
-  // PlayerRobotParams[20] = perfpb_params;
-  // PlayerRobotParams[21] = pion1m_params;
-  // PlayerRobotParams[22] = pion1x_params;
-  // PlayerRobotParams[23] = pionat_params;
-  // PlayerRobotParams[24] = powerbot_sh_params;
-  // PlayerRobotParams[25] = powerbot_params;
-  // PlayerRobotParams[26] = psos1m_params;
-  // PlayerRobotParams[27] = psos1x_params;
-  // PlayerRobotParams[28] = amigo_sh_params;
-  // PlayerRobotParams[29] = p3dx_sh_lms1xx_params;
+    PlayerRobotParams[0] = p2dx_params;
+    // PlayerRobotParams[0] = amigo_params;
+    // PlayerRobotParams[1] = p2at_params;
+    // PlayerRobotParams[2] = p2at8plus_params;
+    // PlayerRobotParams[3] = p2at8_params;
+    // PlayerRobotParams[4] = p2ce_params;
+    // PlayerRobotParams[5] = p2d8plus_params;
+    // PlayerRobotParams[6] = p2d8_params;
+    // PlayerRobotParams[7] = p2de_params;
+    // PlayerRobotParams[8] = p2df_params;
+    // PlayerRobotParams[9] = p2dx_params;
+    // PlayerRobotParams[10] = p2it_params;
+    // PlayerRobotParams[11] = p2pb_params;
+    // PlayerRobotParams[12] = p2pp_params;
+    // PlayerRobotParams[13] = p3at_sh_params;
+    // PlayerRobotParams[14] = p3at_params;
+    // PlayerRobotParams[15] = p3atiw_params;
+    // PlayerRobotParams[16] = p3dx_sh_params;
+    // PlayerRobotParams[17] = p3dx_params;
+    // PlayerRobotParams[18] = peoplebot_sh_params;
+    // PlayerRobotParams[19] = perfpbplus_params;
+    // PlayerRobotParams[20] = perfpb_params;
+    // PlayerRobotParams[21] = pion1m_params;
+    // PlayerRobotParams[22] = pion1x_params;
+    // PlayerRobotParams[23] = pionat_params;
+    // PlayerRobotParams[24] = powerbot_sh_params;
+    // PlayerRobotParams[25] = powerbot_params;
+    // PlayerRobotParams[26] = psos1m_params;
+    // PlayerRobotParams[27] = psos1x_params;
+    // PlayerRobotParams[28] = amigo_sh_params;
+    // PlayerRobotParams[29] = p3dx_sh_lms1xx_params;
 }

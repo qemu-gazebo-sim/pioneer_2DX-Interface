@@ -1,17 +1,10 @@
 #include "p2os.hpp"
 #include "p2os_config.hpp"
 
-P2OS::P2OS(
-    HardwareSerial& debug_serial, 
-    HardwareSerial& pioneer_serial
-) {
+P2OS::P2OS(HardwareSerial& debug_serial, HardwareSerial& pioneer_serial) {
     this->debug_serial = &debug_serial;
     this->pioneer_serial = &pioneer_serial;
-    this->p2os_comm = new P2OSCommunication(
-        *(this->debug_serial),
-        *(this->pioneer_serial)
-    );
-    
+    this->p2os_comm = new P2OSCommunication(*(this->debug_serial), *(this->pioneer_serial));
 }
 
 P2OS::~P2OS() {
@@ -20,9 +13,9 @@ P2OS::~P2OS() {
 
 int P2OS::setup() {
     if (this->p2os_comm->Setup()) {
-        #if ERROR_PRINT
+#if ERROR_PRINT
         this->debug_serial->println("error: p2os setup failed...");
-        #endif
+#endif
         return -1;
     }
 
@@ -35,9 +28,9 @@ int P2OS::setup() {
 
 int P2OS::shutdown() {
     if (this->p2os_comm->Shutdown()) {
-        #if ERROR_PRINT
+#if ERROR_PRINT
         this->debug_serial->println("error: p2os shutdown failed...");
-        #endif
+#endif
         return -1;
     }
 
@@ -45,19 +38,19 @@ int P2OS::shutdown() {
 }
 
 void P2OS::loop() {
-    this->current_time = millis(); // ros::Time currentTime = ros::Time::now();
+    this->current_time = millis();  // ros::Time currentTime = ros::Time::now();
 
     this->p2os_comm->check_and_set_vel();
     this->p2os_comm->check_and_set_motor_state();
 
     if (this->p2os_comm->get_pulse() > 0) {
-      if (this->p2os_comm->millis2Sec(this->current_time - this->last_time_pulse) > this->p2os_comm->get_pulse()) {
-        #if DEBUG_PRINT
-        this->debug_serial->println("sending pulse");
-        #endif
-        this->p2os_comm->SendPulse();
-        this->last_time_pulse = this->current_time;
-      }
+        if (this->p2os_comm->millis2Sec(this->current_time - this->last_time_pulse) > this->p2os_comm->get_pulse()) {
+#if DEBUG_PRINT
+            this->debug_serial->println("sending pulse");
+#endif
+            this->p2os_comm->SendPulse();
+            this->last_time_pulse = this->current_time;
+        }
     }
 
     // Hack fix to get around the fact that if no commands are sent to the
