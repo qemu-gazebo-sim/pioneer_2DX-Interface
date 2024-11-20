@@ -8,6 +8,7 @@
 class P2OS {
 public:
     P2OS(HardwareSerial& debug_serial, HardwareSerial& pioneer_serial);
+
     ~P2OS();
 
     int setup();
