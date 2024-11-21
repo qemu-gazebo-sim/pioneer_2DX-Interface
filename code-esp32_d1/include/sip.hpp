@@ -108,7 +108,6 @@ public:
         blobcolor(0),
         armPowerOn(false),
         armConnected(false),
-        armVersionString(""),
         armNumJoints(0),
         armJoints(NULL),
         lastLiftPos(0.0f) {
@@ -119,6 +118,8 @@ public:
             armJointTargetPos[i] = 0;
         }
         this->debug_serial = &debug_serial;
+        armVersionString = new char[strlen("") + 1];
+        strcpy(armVersionString, "");
     }
 
     ~SIP() { delete[] sonars; }

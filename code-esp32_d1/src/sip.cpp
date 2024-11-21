@@ -1,6 +1,6 @@
-#include <sip.hpp>
 #include <robot_params.hpp>
 #include "p2os_config.hpp"
+#include <sip.hpp>
 
 void SIP::FillStandard(nav_msgs::ros_p2os_data_t* data) {
     ///////////////////////////////////////////////////////////////
@@ -629,9 +629,10 @@ void SIP::ParseArmInfo(unsigned char* buffer) {
     }
 
     // Copy the version string
-    if (armVersionString != "") {
-        free(armVersionString);
-    }
+    // if (armVersionString != "") {
+    free(armVersionString);
+    // }
+
     // strndup() isn't available everywhere (e.g., Darwin)
     // armVersionString = strndup ((char*) &buffer[2], length);  // Can't be any bigger than length
     armVersionString = reinterpret_cast<char*>(calloc(length + 1, sizeof(char)));

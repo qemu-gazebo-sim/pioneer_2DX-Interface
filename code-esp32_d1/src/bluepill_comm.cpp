@@ -162,11 +162,8 @@ int16_t
 }
 
 double BluepillCommunication::getYaw(nav_msgs::Odometry position) {
-    // double qx = position.pose.pose.orientation.x;
-    // double qy = position.pose.pose.orientation.y;
-    // double qz = position.pose.pose.orientation.z;
-    // double qw = position.pose.pose.orientation.w;
-    // double yaw = atan2(2.0 * (qw * qz + qx * qy), 1.0 - 2.0 * (qy * qy + qz * qz));
-    // return yaw;
-    return 0;
+    double y = position.pose.pose.position.y;
+    double x = position.pose.pose.position.x;
+    double yaw = atan2(y, x);
+    return yaw;
 }
