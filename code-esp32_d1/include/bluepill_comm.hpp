@@ -6,11 +6,22 @@
 #include <HardwareSerial.h>
 #include "bluepill_config.hpp"
 
+enum ConnectionStates {
+    NOT_CONNECTED,
+    CONNECTED
+};
+
 class BluepillCommunication {
     // variables
 
 private:
     HardwareSerial* debug_serial;
+
+    /* Connection params */
+    uint32_t         connection_pin_time;
+    uint32_t         connection_pin_sample_sum;
+    uint32_t         connection_pin_counter;
+    ConnectionStates connection_pin_state;
 
     /* Velocity params */
     uint32_t             vel_time;

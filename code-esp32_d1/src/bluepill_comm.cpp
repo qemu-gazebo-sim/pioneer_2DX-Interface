@@ -5,6 +5,9 @@
 BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     this->debug_serial = &debug_serial;
 
+    /* Connection pin settings */
+    pinMode(P2DX_CON, INPUT);
+
     /* Encoders settings */
     pinMode(ENCODER1_S1, OUTPUT);
     pinMode(ENCODER1_S2, OUTPUT);
@@ -40,11 +43,14 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     this->current_velocity = geometry_msgs::Twist();
     this->vel_sample_counter = 0;
     this->vel_time = millis();
+    this->connection_pin_time = millis();
 }
 
 BluepillCommunication::~BluepillCommunication() { }
 
-bool BluepillCommunication::is_bluepill_connected() { }
+bool BluepillCommunication::is_bluepill_connected() {
+    return this->connection_pin_state;
+}
 
 void BluepillCommunication::loop() {
     if (((millis() - this->vel_time) < VELOCITY_SAMPLE_INTERVAL) || (this->vel_sample_counter < 3)) {
@@ -74,6 +80,18 @@ void BluepillCommunication::loop() {
         ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
         this->vel_sample_counter = 0;
         this->vel_time = millis();
+    }
+
+    if (((millis() - this->connection_pin_time) < CONNECTION_SAMPLE_INTERVAL) || (this->vel_sample_counter < 3)) {
+        this->connection_pin_sample_sum += digitalRead(P2DX_CON);
+        this->connection_pin_counter++;
+    } else {
+        this->connection_pin_state =
+            (double(this->connection_pin_sample_sum / this->connection_pin_counter) > 0.5) ? CONNECTED : NOT_CONNECTED;
+
+        this->connection_pin_sample_sum = 0;
+        this->connection_pin_counter = 0;
+        this->connection_pin_time = millis();
     }
 }
 

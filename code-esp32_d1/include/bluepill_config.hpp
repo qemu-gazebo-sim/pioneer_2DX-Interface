@@ -39,4 +39,8 @@
 #define ENCODER2_S2 0
 #define ENCODER2_S3 0
 
+/* Connection pin Config */
+#define CONNECTION_SAMPLE_INTERVAL 10
+#define P2DX_CON 0
+
 #endif  // _BLUEPILL_CONFIG_HPP_
