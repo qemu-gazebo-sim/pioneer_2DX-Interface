@@ -2,9 +2,9 @@
 #define _BLUEPILL_COMM_HPP_
 
 #include "p2os_msgs.hpp"
+#include "bluepill_config.hpp"
 #include <Arduino.h>
 #include <HardwareSerial.h>
-#include "bluepill_config.hpp"
 
 enum ConnectionStates {
     NOT_CONNECTED,

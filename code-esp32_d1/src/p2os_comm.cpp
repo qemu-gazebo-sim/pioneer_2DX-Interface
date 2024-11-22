@@ -1,6 +1,7 @@
-#include <p2os_comm.hpp>
-#include <Arduino.h>
 #include "p2os_config.hpp"
+#include "robot_params.hpp"
+#include <Arduino.h>
+#include <p2os_comm.hpp>
 
 P2OSCommunication::P2OSCommunication(HardwareSerial& debug_serial, HardwareSerial& pioneer_serial) {
     this->debug_serial = &debug_serial;

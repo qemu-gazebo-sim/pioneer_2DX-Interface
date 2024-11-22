@@ -1,9 +1,9 @@
 #ifndef _P2OS_HPP_
 #define _P2OS_HPP_
 
-#include <Arduino.h>
 #include "p2os_comm.hpp"
 #include "p2os_msgs.hpp"
+#include <Arduino.h>
 
 class P2OS {
 public:

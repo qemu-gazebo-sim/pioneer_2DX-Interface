@@ -4,7 +4,7 @@
 
 #include <string>
 
-void initialize_robot_params(void);
+void initialize_robot_params();
 
 #define PLAYER_NUM_ROBOT_TYPES 1
 
@@ -169,24 +169,24 @@ enum P2OSCommand {
 // #define DEFAULT_P2OS_TCP_REMOTE_PORT 8101
 
 /* degrees and radians */
-#define DTOR(a) M_PI* a / 180.0
-#define RTOD(a) 180.0 * a / M_PI
+#define DTOR(a) (M_PI* (a) / 180.0)
+#define RTOD(a) (180.0 * (a) / M_PI)
 
-typedef struct {
+struct bumper_def_t {
     double x;
     double y;
     double th;
     double length;
     double radius;
-} bumper_def_t;
+};
 
-typedef struct {
+struct sonar_pose_t {
     double x;
     double y;
     double th;
-} sonar_pose_t;
+};
 
-typedef struct {
+struct RobotParams_t {
     double       AngleConvFactor;
     std::string  Class;
     double       DiffConvFactor;
@@ -234,7 +234,7 @@ typedef struct {
     double       VelConvFactor;
     sonar_pose_t sonar_pose[32];
     // bumper_def_t bumper_geom[32];
-} RobotParams_t;
+};
 
 extern RobotParams_t PlayerRobotParams[];
 

@@ -2,6 +2,7 @@
 #define _PACKET_HPP_
 
 #include <Arduino.h>
+#include <cstddef>
 
 namespace {
 constexpr size_t packet_len = 256;
@@ -18,7 +19,7 @@ public:
 
     void set_pioneer_serial(HardwareSerial& pioneer_serial);
 
-public:
+
     unsigned char packet[packet_len];
     unsigned char size;
 

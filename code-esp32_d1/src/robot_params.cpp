@@ -2028,7 +2028,7 @@ RobotParams_t p2dx_params = {
 
 RobotParams_t PlayerRobotParams[PLAYER_NUM_ROBOT_TYPES];
 
-void initialize_robot_params(void) {
+void initialize_robot_params() {
     PlayerRobotParams[0] = p2dx_params;
     // PlayerRobotParams[0] = amigo_params;
     // PlayerRobotParams[1] = p2at_params;

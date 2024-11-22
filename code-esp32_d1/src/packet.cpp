@@ -1,5 +1,5 @@
-#include <Arduino.h>
 #include "p2os_config.hpp"
+#include <Arduino.h>
 #include <packet.hpp>
 
 P2OSPacket::P2OSPacket(HardwareSerial& debug_serial, HardwareSerial& pioneer_serial) {

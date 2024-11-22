@@ -1,6 +1,6 @@
-#include <bluepill_comm.hpp>
-#include <Arduino.h>
 #include "bluepill_config.hpp"
+#include <Arduino.h>
+#include <bluepill_comm.hpp>
 
 BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     this->debug_serial = &debug_serial;

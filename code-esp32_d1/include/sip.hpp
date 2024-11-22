@@ -1,16 +1,16 @@
 #ifndef _SIP_HPP_
 #define _SIP_HPP_
 
-#include <p2os_msgs.hpp>
+#include "p2os_msgs.hpp"
 
-typedef struct ArmJoint {
+struct ArmJoint {
     char          speed;
     unsigned char home;
     unsigned char min;
     unsigned char centre;
     unsigned char max;
     unsigned char ticksPer90;
-} ArmJoint;
+};
 
 enum PlayerGripperStates {
     PLAYER_GRIPPER_STATE_OPEN = 1,
@@ -96,7 +96,7 @@ public:
         ypos(0),
         x_offset(0),
         y_offset(0),
-        angle_offset(0),
+        angle_offset(0),        
         blobmx(0),
         blobmy(0),
         blobx1(0),

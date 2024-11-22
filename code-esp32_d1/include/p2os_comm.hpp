@@ -1,11 +1,10 @@
 #ifndef _P2OS_COMM_HPP_
 #define _P2OS_COMM_HPP_
 
-#include <Arduino.h>
 #include "packet.hpp"
 #include "p2os_msgs.hpp"
-#include "robot_params.hpp"
 #include "sip.hpp"
+#include <Arduino.h>
 
 class P2OSCommunication {
 private:
@@ -30,7 +29,7 @@ public:
 
     double pulse;  //! Pulse time
 
-public:
+
     //! Setup the robot for use. Communicates with the robot directly.
     int Setup();
     //! Prepare for shutdown.
@@ -40,7 +39,7 @@ public:
 
     void updateDiagnostics();
 
-    void SendPulse(void);
+    void SendPulse();
 
     void cmdvel_cb(geometry_msgs::Twist* msg);
     void check_and_set_vel();

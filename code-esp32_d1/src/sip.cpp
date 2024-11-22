@@ -1,5 +1,5 @@
-#include <robot_params.hpp>
 #include "p2os_config.hpp"
+#include <robot_params.hpp>
 #include <sip.hpp>
 
 void SIP::FillStandard(nav_msgs::ros_p2os_data_t* data) {
