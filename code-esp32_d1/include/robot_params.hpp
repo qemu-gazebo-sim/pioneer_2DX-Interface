@@ -6,7 +6,7 @@
 
 void initialize_robot_params();
 
-#define PLAYER_NUM_ROBOT_TYPES 1
+#define PLAYER_NUM_ROBOT_TYPES 30
 
 // Default max speeds
 #define MOTOR_DEF_MAX_SPEED 0.5

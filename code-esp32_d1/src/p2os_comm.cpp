@@ -38,6 +38,9 @@ P2OSCommunication::P2OSCommunication(HardwareSerial& debug_serial, HardwareSeria
     spd = 0.0;  // max_yawdecel
     this->motor_max_rot_decel = static_cast<int16_t>(rint(RTOD(spd)));
 
+    this->cmdvel_ = geometry_msgs::Twist();           // initilize cmdvel_
+    this->cmdmotor_state_ = p2os_msgs::MotorState();  // initilize cmdmotor_state_
+
     initialize_robot_params();
 #ifdef P2OS_DEBUG_PRINT
     this->debug_serial->println("Info: P2OSCommunication setted");
@@ -348,7 +351,6 @@ int P2OSCommunication::Setup() {
     cnt += snprintf(subtype, sizeof(subtype), "%s", &(receivedpacket->packet[cnt]));
     cnt++;
 
-    // std::string hwID = std::string(name) + ": " + std::string(type) + "/" + std::string(subtype);
     // diagnostic_.setHardwareID(hwID);
 
     command = OPEN;
@@ -369,6 +371,9 @@ int P2OSCommunication::Setup() {
         if (!strcasecmp(PlayerRobotParams[i].Class.c_str(), type) &&
             !strcasecmp(PlayerRobotParams[i].Subclass.c_str(), subtype)) {
             param_idx = i;
+#ifdef P2OS_INFO_PRINT
+            this->debug_serial->printf("Robot index: %d\n", param_idx);
+#endif
             break;
         }
     }
