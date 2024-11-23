@@ -19,7 +19,6 @@ HardwareSerial pioneer_serial(2);  // define a Serial for UART2
 
 P2OS*    p2os;
 uint32_t last_time_motor_state = 0;
-uint32_t current_time;
 
 #ifndef USE_PS5_CONTROL
 BluepillCommunication* bluepill_comm;
@@ -43,40 +42,40 @@ void setup() {
 
 void loop() {
 #ifdef USE_PS5_CONTROL
-    bool    is_connected = 0;
-    uint8_t current_r2_val = 0;
-    uint8_t current_l2_val = 0;
-    int16_t current_rs_x_val = 0;
+    bool     is_connected = 0;
+    uint16_t current_r2_val = 0;
+    uint16_t current_l2_val = 0;
+    int16_t  current_rs_x_val = 0;
 
     geometry_msgs::Twist  msg_vel;
     p2os_msgs::MotorState msg_motor_state;
 
     while (ps5.isConnected() == true) {
-        if (ps5.Up()) {
+        if (ps5.Up() && (is_connected < 1)) {
             is_connected = !(p2os->setup());
         }
 
-        if (ps5.Down()) {
+        if (ps5.Down() && (is_connected > 0)) {
             is_connected = p2os->shutdown();
         }
 
         if (is_connected) {
-            current_time = millis();
             p2os->loop();
 
-            current_r2_val = ps5.R2Value();  // value 0 - 255
-            current_l2_val = ps5.L2Value();  // value 0 - 255
-            current_rs_x_val = (-1) * scale(ps5.RStickX(), -128, 128, -100, 100);
+            current_r2_val = scale(ps5.R2Value(), 0, 255, 0, 400);  // max it is 500, but we are using 400
+            current_l2_val = scale(ps5.L2Value(), 0, 255, 0, 400);  // max it is 500, but we are using 400
+            current_rs_x_val =
+                (-1) * scale(ps5.RStickX(), -128, 128, -170, 170);  // max it is 180, but we are using 170
 
-            msg_vel.linear.x = double(double(current_r2_val - current_l2_val) / 100);
-            msg_vel.angular.z = double(current_rs_x_val) / 100;
+            msg_vel.linear.x = double(double(current_r2_val - current_l2_val) / 1000);
+            msg_vel.angular.z = double(double(current_rs_x_val) / 100);
 
             p2os->set_vel(&msg_vel);
 
-            if (current_time - last_time_motor_state > 100) {
+            if (millis() - last_time_motor_state > 100) {
                 msg_motor_state.state = 1;
                 p2os->set_motor_state(&msg_motor_state);
-                last_time_motor_state = current_time;
+                last_time_motor_state = millis();
             }
         }
     }
@@ -103,14 +102,13 @@ void loop() {
         }
 
         if (current_connected_state == CONNECTED) {
-            current_time = millis();
             p2os->loop();
             current_vel = bluepill_comm->get_velocity();
             p2os->set_vel(&current_vel);
-            if (current_time - last_time_motor_state > 100) {
+            if (millis() - last_time_motor_state > 100) {
                 msg_motor_state.state = 1;
                 p2os->set_motor_state(&msg_motor_state);
-                last_time_motor_state = current_time;
+                last_time_motor_state = millis();
             }
         }
     }
