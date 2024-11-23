@@ -76,7 +76,7 @@ void BluepillCommunication::loop() {
             (this->motor_gpio_state[3] << 2) | (this->motor_gpio_state[4] << 1) | this->motor_gpio_state[5];
 
         this->current_velocity.linear.x = scale(linear_vel, -4, 4, -400, 400);
-        this->current_velocity.angular.z = scale(angular_vel, -4, 4, -100, 100);
+        this->current_velocity.angular.z = scale(angular_vel, -4, 4, -170, 170);
 
         ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
         this->vel_sample_counter = 0;

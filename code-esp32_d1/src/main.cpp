@@ -110,6 +110,7 @@ void loop() {
                 p2os->set_motor_state(&msg_motor_state);
                 last_time_motor_state = millis();
             }
+            bluepill_comm->update_p2dx_data(p2os->get_p2dx_data());
         }
     }
 #endif
