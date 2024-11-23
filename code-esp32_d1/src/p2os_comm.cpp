@@ -18,7 +18,7 @@ P2OSCommunication::P2OSCommunication(HardwareSerial& debug_serial, HardwareSeria
     this->trans_ki = -1;   // trans_ki
     // std::string def = DEFAULT_P2OS_PORT; // !!! port !!!
     // this->psos_serial_port = def;
-    this->psos_use_tcp = false;
+    // this->psos_use_tcp = false;
     // std::string host = DEFAULT_P2OS_TCP_REMOTE_HOST;
     // this->psos_tcp_host = host;
     // this->psos_tcp_port = DEFAULT_P2OS_TCP_REMOTE_PORT;
@@ -49,7 +49,7 @@ P2OSCommunication::P2OSCommunication(HardwareSerial& debug_serial, HardwareSeria
 
 P2OSCommunication::~P2OSCommunication() { /** Destructor **/ }
 
-/* Motor setup*/
+/* Motor setup */
 void P2OSCommunication::cmdmotor_state(p2os_msgs::MotorState* msg) {
     this->motor_dirty = true;
     this->cmdmotor_state_ = *msg;
@@ -86,7 +86,7 @@ void P2OSCommunication::send_motor_state(int state) {
 
 // void P2OSNode::check_and_set_gripper_state()
 
-/* Velocity setup*/
+/* Velocity setup */
 void P2OSCommunication::cmdvel_cb(geometry_msgs::Twist* msg) {
     if (fabs(msg->linear.x - cmdvel_.linear.x) > 0.01 || fabs(msg->angular.z - cmdvel_.angular.z) > 0.01) {
         this->veltime = millis();
@@ -182,7 +182,7 @@ void P2OSCommunication::send_vel(int lin_vel, int ang_vel) {
 int P2OSCommunication::Setup() {
     int           i;
     unsigned long bauds[] = {9600, 38400, 19200, 115200, 57600};
-    int           numbauds = 5;  // sizeof(bauds);
+    int           numbauds = sizeof(bauds);
     int           currbaud = 0;
     sippacket = NULL;
     // lastPulseTime = 0.0;
@@ -239,6 +239,7 @@ int P2OSCommunication::Setup() {
                 break;
             case AFTER_FIRST_SYNC:
 #ifdef P2OS_INFO_PRINT
+                this->debug_serial->println("AFTER_FIRST_SYNC");
                 this->debug_serial->println("Info: turning off NONBLOCK mode...");
 #endif
                 // if (!this->pioneer_serial->available()) {
@@ -253,7 +254,7 @@ int P2OSCommunication::Setup() {
                 break;
             case AFTER_SECOND_SYNC:
 #ifdef P2OS_DEBUG_PRINT
-                this->debug_serial->println("SYNC2");
+                this->debug_serial->println("AFTER_SECOND_SYNC");
 #endif
                 command = SYNC2;
                 packet->Build(&command, 1);
@@ -314,6 +315,9 @@ int P2OSCommunication::Setup() {
             default:
                 // maybe P2OS is still running from last time.  let's try to CLOSE
                 // and reconnect
+#ifdef P2OS_DEBUG_PRINT
+                this->debug_serial->println("switch (receivedpacket->packet[3]) default state");
+#endif
                 if (!sent_close) {
 #ifdef P2OS_DEBUG_PRINT
                     this->debug_serial->println("sending CLOSE");
@@ -324,22 +328,22 @@ int P2OSCommunication::Setup() {
                     sent_close = true;
                     delay(2 * 200);  // delayMicroseconds(2*P2OS_CYCLETIME_USEC);
                     this->pioneer_serial->flush();
-                    psos_state = NO_SYNC;
                 }
+                psos_state = NO_SYNC;
                 break;
         }
         delay(200);  // delayMicroseconds(P2OS_CYCLETIME_USEC);
     }
 
     if (psos_state != READY) {
-        if (this->psos_use_tcp) {
-            // this->debug_serial->printf(
-            //     "Couldn't synchronize with P2OS.\n"
-            //     "  Most likely because the robot is not connected %s %s",
-            //     this->psos_use_tcp ? "to the ethernet-serial bridge device " : "to the serial port",
-            //     this->psos_use_tcp ? this->psos_tcp_host.c_str() : this->psos_serial_port.c_str()
-            // );
-        }
+        // if (this->psos_use_tcp) {
+        // this->debug_serial->printf(
+        //     "Couldn't synchronize with P2OS.\n"
+        //     "  Most likely because the robot is not connected %s %s",
+        //     this->psos_use_tcp ? "to the ethernet-serial bridge device " : "to the serial port",
+        //     this->psos_use_tcp ? this->psos_tcp_host.c_str() : this->psos_serial_port.c_str()
+        // );
+        // }
         // this->psos_fd = -1;
         return 1;
     }
@@ -435,6 +439,7 @@ int P2OSCommunication::Setup() {
         accel_packet->Build(accel_command, 4);
         this->SendReceive(accel_packet, false);
     }
+
     delete accel_packet;
 
     // if requested, change PID settings
@@ -493,6 +498,7 @@ int P2OSCommunication::Setup() {
         pid_packet->Build(pid_command, 4);
         this->SendReceive(pid_packet);
     }
+
     delete pid_packet;
 
     return 0;

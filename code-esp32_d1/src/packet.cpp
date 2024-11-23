@@ -143,7 +143,6 @@ int P2OSPacket::Receive() {
 #endif
             }
         }
-// this->debug_serial->println("Receive 4");
 #ifdef P2OS_DEBUG_PRINT
         this->debug_serial->println("Received:");
         this->PrintHex();
