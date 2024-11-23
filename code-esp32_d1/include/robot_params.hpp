@@ -169,7 +169,7 @@ enum P2OSCommand {
 // #define DEFAULT_P2OS_TCP_REMOTE_PORT 8101
 
 /* degrees and radians */
-#define DTOR(a) (M_PI* (a) / 180.0)
+#define DTOR(a) (M_PI * (a) / 180.0)
 #define RTOD(a) (180.0 * (a) / M_PI)
 
 struct bumper_def_t {

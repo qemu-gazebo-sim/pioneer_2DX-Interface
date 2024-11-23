@@ -199,7 +199,7 @@ int SIP::PositionChange(uint16_t from, uint16_t to) {
 }
 
 void SIP::Print() {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
     int i;
 
     this->debug_serial->printf("debug: lwstall:%d rwstall:%d\n", lwstall, rwstall);
@@ -262,7 +262,7 @@ void SIP::PrintSonars() {
 }
 
 void SIP::PrintArm() {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
     String arm_power_state = (armPowerOn ? "on" : "off");
     String arm_connected = (armConnected ? "" : "not ");
     this->debug_serial->printf("debug: Arm power is %s\tArm is %sconnected\n", arm_power_state, arm_connected);
@@ -276,7 +276,7 @@ void SIP::PrintArm() {
 }
 
 void SIP::PrintArmInfo() {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
     this->debug_serial->printf("debug: Arm version:\t%s\n", armVersionString);
     this->debug_serial->printf("debug: Arm has %d joints:\n", armNumJoints);
     this->debug_serial->printf("debug:  |\tSpeed\tHome\tMin\tCentre\tMax\tTicks/90\n");
@@ -311,7 +311,7 @@ void SIP::ParseStandard(unsigned char* buffer) {
     if (xpos != INT_MAX) {
         change = static_cast<int>(rint(PositionChange(rawxpos, newxpos) * PlayerRobotParams[param_idx].DistConvFactor));
         if (abs(change) > 100) {
-#if ERROR_PRINT
+#ifdef P2OS_ERROR_PRINT
             this->debug_serial->printf("error: invalid odometry change [%d]; odometry values are tainted\n", change);
 #endif
         } else {
@@ -328,7 +328,7 @@ void SIP::ParseStandard(unsigned char* buffer) {
     if (ypos != INT_MAX) {
         change = static_cast<int>(rint(PositionChange(rawypos, newypos) * PlayerRobotParams[param_idx].DistConvFactor));
         if (abs(change) > 100) {
-#if ERROR_PRINT
+#ifdef P2OS_ERROR_PRINT
             this->debug_serial->printf("error: invalid odometry change [%d]; odometry values are tainted\n", change);
 #endif
         } else {
@@ -355,7 +355,7 @@ void SIP::ParseStandard(unsigned char* buffer) {
 
     battery = buffer[cnt];
     cnt += sizeof(unsigned char);
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
     this->debug_serial->printf("debug: battery value: %d\n", battery);
 #endif
 
@@ -446,7 +446,7 @@ void SIP::ParseSERAUX(unsigned char* buffer) {
     unsigned char type = buffer[1];
     if (type != SERAUX && type != SERAUX2) {
 // Really should never get here...
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: Attempt to parse non SERAUX packet as serial data.\n");
 #endif
         return;
@@ -468,7 +468,7 @@ void SIP::ParseSERAUX(unsigned char* buffer) {
         }
     }
     if (len < 10 || ix > len - 8) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: Failed to get a full blob tracking packet.\n");
 #endif
         return;
@@ -477,7 +477,7 @@ void SIP::ParseSERAUX(unsigned char* buffer) {
     // There is a special 'S' message containing the tracking color info
     if (buffer[ix + 1] == 'S') {
 // Color information (track color)
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf(
             "Tracking color (RGB):  %d %d %d\n"
             "       with variance:  %d %d %d\n",
@@ -503,7 +503,7 @@ void SIP::ParseSERAUX(unsigned char* buffer) {
         return;
     }
 
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
     this->debug_serial->printf("debug: Unknown blob tracker packet type: %c\n", buffer[ix + 1]);
 #endif
 }
@@ -522,14 +522,14 @@ void SIP::ParseGyro(unsigned char* buffer) {
     unsigned char type = buffer[1];
     if (type != GYROPAC) {
 // Really should never get here...
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: Attempt to parse non GYRO packet as gyro data.\n");
 #endif
         return;
     }
 
     if (len < 1) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: Couldn't get gyro measurement count\n");
 #endif
         return;
@@ -540,7 +540,7 @@ void SIP::ParseGyro(unsigned char* buffer) {
 
     // sanity check
     if ((len - 1) != (count * 3)) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: Mismatch between gyro measurement count and packet length\n");
 #endif
         return;
@@ -572,14 +572,14 @@ void SIP::ParseArm(unsigned char* buffer) {
     int length = static_cast<int>(buffer[0]) - 2;
 
     if (buffer[1] != ARMPAC) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: Attempt to parse a non ARM packet as arm data.\n");
 #endif
         return;
     }
 
     if (length < 1 || length != 9) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: ARMpac length incorrect size\n");
 #endif
         return;
@@ -615,14 +615,14 @@ void SIP::ParseArm(unsigned char* buffer) {
 void SIP::ParseArmInfo(unsigned char* buffer) {
     int length = static_cast<int>(buffer[0]) - 2;
     if (buffer[1] != ARMINFOPAC) {
-#if ERROR_PRINT
+#ifdef P2OS_ERROR_PRINT
         this->debug_serial->printf("error: Attempt to parse a non ARMINFO packet as arm info.\n");
 #endif
         return;
     }
 
     if (length < 1) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
         this->debug_serial->printf("debug: ARMINFOpac length bad size\n");
 #endif
         return;

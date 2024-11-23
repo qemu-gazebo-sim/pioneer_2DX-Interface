@@ -13,7 +13,7 @@ P2OS::~P2OS() {
 
 int P2OS::setup() {
     if (this->p2os_comm->Setup()) {
-#if ERROR_PRINT
+#ifdef P2OS_ERROR_PRINT
         this->debug_serial->println("error: p2os setup failed...");
 #endif
         return -1;
@@ -28,7 +28,7 @@ int P2OS::setup() {
 
 int P2OS::shutdown() {
     if (this->p2os_comm->Shutdown()) {
-#if ERROR_PRINT
+#ifdef P2OS_ERROR_PRINT
         this->debug_serial->println("error: p2os shutdown failed...");
 #endif
         return -1;
@@ -45,7 +45,7 @@ void P2OS::loop() {
 
     if (this->p2os_comm->get_pulse() > 0) {
         if (this->p2os_comm->millis2Sec(this->current_time - this->last_time_pulse) > this->p2os_comm->get_pulse()) {
-#if DEBUG_PRINT
+#ifdef P2OS_DEBUG_PRINT
             this->debug_serial->println("sending pulse");
 #endif
             this->p2os_comm->SendPulse();

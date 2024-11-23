@@ -29,7 +29,6 @@ public:
 
     double pulse;  //! Pulse time
 
-
     //! Setup the robot for use. Communicates with the robot directly.
     int Setup();
     //! Prepare for shutdown.

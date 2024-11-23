@@ -96,7 +96,7 @@ public:
         ypos(0),
         x_offset(0),
         y_offset(0),
-        angle_offset(0),        
+        angle_offset(0),
         blobmx(0),
         blobmy(0),
         blobx1(0),

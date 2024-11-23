@@ -19,7 +19,6 @@ public:
 
     void set_pioneer_serial(HardwareSerial& pioneer_serial);
 
-
     unsigned char packet[packet_len];
     unsigned char size;
 
