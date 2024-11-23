@@ -1,6 +1,7 @@
 #include "bluepill_config.hpp"
 #include <Arduino.h>
 #include <bluepill_comm.hpp>
+#include "utils.hpp"
 
 BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     this->debug_serial = &debug_serial;
@@ -48,7 +49,7 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
 
 BluepillCommunication::~BluepillCommunication() { }
 
-bool BluepillCommunication::is_bluepill_connected() {
+ConnectionStates BluepillCommunication::is_bluepill_connected() {
     return this->connection_pin_state;
 }
 
@@ -74,8 +75,8 @@ void BluepillCommunication::loop() {
         int16_t angular_vel =
             (this->motor_gpio_state[3] << 2) | (this->motor_gpio_state[4] << 1) | this->motor_gpio_state[5];
 
-        this->current_velocity.linear.x = this->scale(linear_vel, -4, 4, -400, 400);
-        this->current_velocity.angular.z = this->scale(angular_vel, -4, 4, -100, 100);
+        this->current_velocity.linear.x = scale(linear_vel, -4, 4, -400, 400);
+        this->current_velocity.angular.z = scale(angular_vel, -4, 4, -100, 100);
 
         ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
         this->vel_sample_counter = 0;
@@ -172,11 +173,6 @@ void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
     digitalWrite(DDS_6, dds_gpio_state[5]);
     digitalWrite(DDS_7, dds_gpio_state[6]);
     digitalWrite(DDS_8, dds_gpio_state[7]);
-}
-
-int16_t
-    BluepillCommunication::scale(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max) {
-    return int(new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min));
 }
 
 double BluepillCommunication::getYaw(nav_msgs::Odometry position) {

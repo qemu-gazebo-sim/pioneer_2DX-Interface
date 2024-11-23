@@ -45,7 +45,7 @@ public:
 
     ~BluepillCommunication();
 
-    bool is_bluepill_connected();
+    ConnectionStates is_bluepill_connected();
 
     void loop();
 
@@ -57,8 +57,6 @@ protected:
     void update_encoder_data(nav_msgs::Odometry position);
 
     void update_dds_data(p2os_msgs::SonarArray dds_data);
-
-    int16_t scale(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max);
 
     double getYaw(nav_msgs::Odometry position);
 };
