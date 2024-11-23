@@ -2,9 +2,9 @@
 #define _BLUEPILL_CONFIG_HPP_
 
 /* Debug Config */
-#define BLUEPILL_DEBUG_PRINT 0  // Set to 1 to enable, 0 to disable
-#define BLUEPILL_INFO_PRINT 0   // Set to 1 to enable, 0 to disable
-#define BLUEPILL_ERROR_PRINT 0  // Set to 1 to enable, 0 to disable
+#define BLUEPILL_DEBUG_PRINT  // to use p2os debug prints uncomment this line
+#define BLUEPILL_INFO_PRINT   // to use p2os info prints uncomment this line
+#define BLUEPILL_ERROR_PRINT  // to use p2os error prints uncomment this line
 
 /* Velocity Config */
 #define VELOCITY_SAMPLE_INTERVAL 10

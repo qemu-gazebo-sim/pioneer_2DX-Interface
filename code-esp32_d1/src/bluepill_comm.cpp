@@ -148,13 +148,13 @@ void BluepillCommunication::update_encoder_data(nav_msgs::Odometry position) {
 void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
     int32_t values_to_read = dds_data.ranges_count;
     if (dds_data.ranges_count < NUM_DDS) {
-#if BLUEPILL_INFO_PRINT
+#ifdef BLUEPILL_INFO_PRINT
         this->debug_serial->println("Info: BluepillCommunication:update_dds_data range count smaller than 8");
 #endif
     }
 
     if (dds_data.ranges_count > NUM_DDS) {
-#if BLUEPILL_INFO_PRINT
+#ifdef BLUEPILL_INFO_PRINT
         this->debug_serial->println("Info: BluepillCommunication:update_dds_data range count bigger than 8");
 #endif
         int32_t values_to_read = NUM_DDS;
