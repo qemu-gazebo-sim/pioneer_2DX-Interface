@@ -71,9 +71,12 @@ void BluepillCommunication::loop() {
         this->motor_gpio_state[5] = double(this->motor_sample_sum[5] / this->vel_sample_counter) > 0.5;
 
         int16_t linear_vel =
-            (this->motor_gpio_state[0] << 2) | (this->motor_gpio_state[1] << 1) | this->motor_gpio_state[2];
+            ((this->motor_gpio_state[0] << 2) | (this->motor_gpio_state[1] << 1) | (this->motor_gpio_state[2]));
+
         int16_t angular_vel =
-            (this->motor_gpio_state[3] << 2) | (this->motor_gpio_state[4] << 1) | this->motor_gpio_state[5];
+            ((this->motor_gpio_state[3] << 2) | (this->motor_gpio_state[4] << 1) | this->motor_gpio_state[5]);
+
+        // transform vel motot left and right to linear anf angular
 
         this->current_velocity.linear.x = scale(linear_vel, -4, 4, -400, 400);
         this->current_velocity.angular.z = scale(angular_vel, -4, 4, -170, 170);
@@ -162,7 +165,7 @@ void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
     }
 
     for (int i = 0; i < values_to_read; i++) {
-        dds_gpio_state[i] = (dds_data.ranges[i] > DDS_THRESHOLD) ? HIGH : LOW;
+        dds_gpio_state[i] = (dds_data.ranges[i] > DDS_THRESHOLD) ? LOW : HIGH;
     }
 
     digitalWrite(DDS_1, dds_gpio_state[0]);
@@ -180,4 +183,12 @@ double BluepillCommunication::getYaw(nav_msgs::Odometry position) {
     double x = position.pose.pose.position.x;
     double yaw = atan2(y, x);
     return yaw;
+}
+
+void BluepillCommunication::send_bluepill_connection(ConnectionStates connection_state) {
+    if (connection_state == CONNECTED) {
+        digitalWrite(P2DX_CON_2, HIGH);
+    } else {
+        digitalWrite(P2DX_CON_2, LOW);
+    }
 }

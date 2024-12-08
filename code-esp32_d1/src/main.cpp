@@ -99,6 +99,8 @@ void loop() {
                     debug_serial.println("Error: Cry! - switch (bluepill_comm->is_bluepill_connected())");
                     break;
             }
+
+            bluepill_comm->send_bluepill_connection(current_connected_state);
         }
 
         if (current_connected_state == CONNECTED) {

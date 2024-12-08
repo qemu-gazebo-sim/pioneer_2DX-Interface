@@ -47,6 +47,8 @@ public:
 
     ConnectionStates is_bluepill_connected();
 
+    void send_bluepill_connection(ConnectionStates connection_state);
+
     void loop();
 
     geometry_msgs::Twist get_velocity();
