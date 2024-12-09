@@ -11,6 +11,11 @@ enum ConnectionStates {
     CONNECTED
 };
 
+struct MotorSpeed {
+    int8_t      left;
+    int8_t      right;
+};
+
 class BluepillCommunication {
     // variables
 
@@ -29,6 +34,7 @@ private:
     uint32_t             vel_sample_counter;
     bool                 motor_gpio_state[NUM_MOTOR_COMMS];
     geometry_msgs::Twist current_velocity;
+    MotorSpeed current_motors_speed;
 
     /* DDS values */
     p2os_msgs::SonarArray current_ultrasonic_data;
@@ -50,6 +56,8 @@ public:
     void send_bluepill_connection(ConnectionStates connection_state);
 
     void loop();
+
+    MotorSpeed get_each_motor_speed();
 
     geometry_msgs::Twist get_velocity();
 

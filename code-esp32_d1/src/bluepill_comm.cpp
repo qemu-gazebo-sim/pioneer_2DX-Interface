@@ -8,6 +8,9 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
 
     /* Connection pin settings */
     pinMode(P2DX_CON, INPUT);
+    pinMode(P2DX_CON_2, OUTPUT);
+    pinMode(LED_CONN, OUTPUT);
+
 
     /* Encoders settings */
     pinMode(ENCODER1_S1, OUTPUT);
@@ -26,7 +29,7 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     pinMode(DDS_5, OUTPUT);
     pinMode(DDS_6, OUTPUT);
     pinMode(DDS_7, OUTPUT);
-    pinMode(DDS_8, OUTPUT);
+    // pinMode(DDS_8, OUTPUT);
     this->current_ultrasonic_data = p2os_msgs::SonarArray();
     ::memset(this->dds_gpio_state, LOW, sizeof(this->dds_gpio_state));
 
@@ -42,9 +45,13 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     ::memset(this->motor_gpio_state, false, sizeof(this->motor_gpio_state));
 
     this->current_velocity = geometry_msgs::Twist();
+    this->current_motors_speed = MotorSpeed();
+
     this->vel_sample_counter = 0;
     this->vel_time = millis();
     this->connection_pin_time = millis();
+
+    this->connection_pin_state = NOT_CONNECTED;
 }
 
 BluepillCommunication::~BluepillCommunication() { }
@@ -70,12 +77,21 @@ void BluepillCommunication::loop() {
         this->motor_gpio_state[4] = double(this->motor_sample_sum[4] / this->vel_sample_counter) > 0.5;
         this->motor_gpio_state[5] = double(this->motor_sample_sum[5] / this->vel_sample_counter) > 0.5;
 
-        int16_t linear_vel =
-            ((this->motor_gpio_state[0] << 2) | (this->motor_gpio_state[1] << 1) | (this->motor_gpio_state[2]));
+        this->current_motors_speed.left = (
+            (this->motor_gpio_state[0] << 2) 
+            | (this->motor_gpio_state[1] << 1) 
+            | (this->motor_gpio_state[2])
+        );
 
-        int16_t angular_vel =
-            ((this->motor_gpio_state[3] << 2) | (this->motor_gpio_state[4] << 1) | this->motor_gpio_state[5]);
+        this->current_motors_speed.right = (
+            (this->motor_gpio_state[3] << 2) 
+            | (this->motor_gpio_state[4] << 1) 
+            | (this->motor_gpio_state[5])
+        );
 
+        int16_t linear_vel = this->current_motors_speed.left;
+        int16_t angular_vel = this->current_motors_speed.right;
+        
         // transform vel motot left and right to linear anf angular
 
         this->current_velocity.linear.x = scale(linear_vel, -4, 4, -400, 400);
@@ -91,12 +107,16 @@ void BluepillCommunication::loop() {
         this->connection_pin_counter++;
     } else {
         this->connection_pin_state =
-            (double(this->connection_pin_sample_sum / this->connection_pin_counter) > 0.5) ? CONNECTED : NOT_CONNECTED;
+            (this->connection_pin_sample_sum > (this->connection_pin_counter * 5 / 10) ) ? CONNECTED : NOT_CONNECTED;
 
         this->connection_pin_sample_sum = 0;
         this->connection_pin_counter = 0;
         this->connection_pin_time = millis();
     }
+}
+
+MotorSpeed BluepillCommunication::get_each_motor_speed() {
+    return this->current_motors_speed;
 }
 
 geometry_msgs::Twist BluepillCommunication::get_velocity() {
@@ -175,7 +195,7 @@ void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
     digitalWrite(DDS_5, dds_gpio_state[4]);
     digitalWrite(DDS_6, dds_gpio_state[5]);
     digitalWrite(DDS_7, dds_gpio_state[6]);
-    digitalWrite(DDS_8, dds_gpio_state[7]);
+    // digitalWrite(DDS_8, dds_gpio_state[7]);
 }
 
 double BluepillCommunication::getYaw(nav_msgs::Odometry position) {
