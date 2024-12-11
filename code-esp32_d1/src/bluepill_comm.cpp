@@ -11,7 +11,6 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     pinMode(P2DX_CON_2, OUTPUT);
     pinMode(LED_CONN, OUTPUT);
 
-
     /* Encoders settings */
     pinMode(ENCODER1_S1, OUTPUT);
     pinMode(ENCODER1_S2, OUTPUT);
@@ -85,27 +84,20 @@ void BluepillCommunication::loop() {
         this->motor_gpio_state[5] = double(this->motor_sample_sum[5] / this->vel_sample_counter) > 0.5;
 
         this->current_motors_speed.left = this->to_signed(
-                (this->motor_gpio_state[0] << 0) 
-            |   (this->motor_gpio_state[1] << 1) 
-            |   (this->motor_gpio_state[2] << 2),
-            3
+            (this->motor_gpio_state[0] << 0) | (this->motor_gpio_state[1] << 1) | (this->motor_gpio_state[2] << 2), 3
         );
 
         this->current_motors_speed.right = this->to_signed(
-                (this->motor_gpio_state[3] << 0) 
-            |   (this->motor_gpio_state[4] << 1) 
-            |   (this->motor_gpio_state[5] << 2),
-            3
+            (this->motor_gpio_state[3] << 0) | (this->motor_gpio_state[4] << 1) | (this->motor_gpio_state[5] << 2), 3
         );
 
-
-        int16_t linear_vel =  this->current_motors_speed.right + this->current_motors_speed.left;
-        linear_vel = scale(linear_vel, -8, 8, -800, 800) / 2; // scale(linear_vel, -4, 4, -400, 400);
+        int16_t linear_vel = this->current_motors_speed.right + this->current_motors_speed.left;
+        linear_vel = scale(linear_vel, -8, 8, -800, 800) / 2;  // scale(linear_vel, -4, 4, -400, 400);
 
         int16_t angular_vel = this->current_motors_speed.right - this->current_motors_speed.left;
-        angular_vel = scale(angular_vel, -8, 8, -340, 340) / 2; // scale(angular_vel, -4, 4, -170, 170);
+        angular_vel = scale(angular_vel, -8, 8, -340, 340) / 2;  // scale(angular_vel, -4, 4, -170, 170);
 
-        this->current_velocity.linear.x = double(linear_vel); 
+        this->current_velocity.linear.x = double(linear_vel);
         this->current_velocity.angular.z = double(angular_vel);
 
         ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
@@ -118,7 +110,7 @@ void BluepillCommunication::loop() {
         this->connection_pin_counter++;
     } else {
         this->connection_pin_state =
-            (this->connection_pin_sample_sum > (this->connection_pin_counter * 5 / 10) ) ? CONNECTED : NOT_CONNECTED;
+            (this->connection_pin_sample_sum > (this->connection_pin_counter * 5 / 10)) ? CONNECTED : NOT_CONNECTED;
 
         this->connection_pin_sample_sum = 0;
         this->connection_pin_counter = 0;

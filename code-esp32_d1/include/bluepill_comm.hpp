@@ -12,8 +12,8 @@ enum ConnectionStates {
 };
 
 struct MotorSpeed {
-    int8_t      left;
-    int8_t      right;
+    int8_t left;
+    int8_t right;
 };
 
 class BluepillCommunication {
@@ -34,7 +34,7 @@ private:
     uint32_t             vel_sample_counter;
     bool                 motor_gpio_state[NUM_MOTOR_COMMS];
     geometry_msgs::Twist current_velocity;
-    MotorSpeed current_motors_speed;
+    MotorSpeed           current_motors_speed;
 
     /* DDS values */
     p2os_msgs::SonarArray current_ultrasonic_data;
