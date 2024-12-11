@@ -16,6 +16,7 @@ void setup() {
 
     debug_serial.println("Ready!");
     print_time = millis();
+
 }
 
 void loop() {
@@ -23,11 +24,17 @@ void loop() {
 
     if ((millis() - print_time) > 500) {
         geometry_msgs::Twist current_vel = bluepill_comm->get_velocity();
-        double               linear_vel = current_vel.linear.x;
-        double               angular_vel = current_vel.angular.z;
+        MotorSpeed current_motors_speed = bluepill_comm->get_each_motor_speed();
         ConnectionStates     connection = bluepill_comm->is_bluepill_connected();
 
-        debug_serial.printf("Lin vel: %lf | Ang vel: %lf | Connection: %d\n", linear_vel, angular_vel, connection);
+        debug_serial.printf(
+            "Left: %d | Right: %d |  Linear: %lf |  Angular: %lf | Connection: %d\n", 
+            current_motors_speed.left, 
+            current_motors_speed.right,
+            current_vel.linear.x,
+            current_vel.angular.z,
+            connection
+        );
 
         print_time = millis();
     }

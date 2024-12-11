@@ -60,6 +60,13 @@ ConnectionStates BluepillCommunication::is_bluepill_connected() {
     return this->connection_pin_state;
 }
 
+int8_t BluepillCommunication::to_signed(int value, int bits) {
+    if (value & (1 << (bits - 1))) {
+        return value | (~((1 << bits) - 1));
+    }
+    return value;
+}
+
 void BluepillCommunication::loop() {
     if (((millis() - this->vel_time) < VELOCITY_SAMPLE_INTERVAL) || (this->vel_sample_counter < 3)) {
         this->motor_sample_sum[0] += digitalRead(MOTOR1_COMM1);
@@ -77,25 +84,29 @@ void BluepillCommunication::loop() {
         this->motor_gpio_state[4] = double(this->motor_sample_sum[4] / this->vel_sample_counter) > 0.5;
         this->motor_gpio_state[5] = double(this->motor_sample_sum[5] / this->vel_sample_counter) > 0.5;
 
-        this->current_motors_speed.left = (
-            (this->motor_gpio_state[0] << 2) 
-            | (this->motor_gpio_state[1] << 1) 
-            | (this->motor_gpio_state[2])
+        this->current_motors_speed.left = this->to_signed(
+                (this->motor_gpio_state[0] << 0) 
+            |   (this->motor_gpio_state[1] << 1) 
+            |   (this->motor_gpio_state[2] << 2),
+            3
         );
 
-        this->current_motors_speed.right = (
-            (this->motor_gpio_state[3] << 2) 
-            | (this->motor_gpio_state[4] << 1) 
-            | (this->motor_gpio_state[5])
+        this->current_motors_speed.right = this->to_signed(
+                (this->motor_gpio_state[3] << 0) 
+            |   (this->motor_gpio_state[4] << 1) 
+            |   (this->motor_gpio_state[5] << 2),
+            3
         );
 
-        int16_t linear_vel = this->current_motors_speed.left;
-        int16_t angular_vel = this->current_motors_speed.right;
-        
-        // transform vel motot left and right to linear anf angular
 
-        this->current_velocity.linear.x = scale(linear_vel, -4, 4, -400, 400);
-        this->current_velocity.angular.z = scale(angular_vel, -4, 4, -170, 170);
+        int16_t linear_vel =  this->current_motors_speed.right + this->current_motors_speed.left;
+        linear_vel = scale(linear_vel, -8, 8, -800, 800) / 2; // scale(linear_vel, -4, 4, -400, 400);
+
+        int16_t angular_vel = this->current_motors_speed.right - this->current_motors_speed.left;
+        angular_vel = scale(angular_vel, -8, 8, -340, 340) / 2; // scale(angular_vel, -4, 4, -170, 170);
+
+        this->current_velocity.linear.x = double(linear_vel); 
+        this->current_velocity.angular.z = double(angular_vel);
 
         ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
         this->vel_sample_counter = 0;

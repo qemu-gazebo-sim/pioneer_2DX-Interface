@@ -69,6 +69,8 @@ protected:
     void update_dds_data(p2os_msgs::SonarArray dds_data);
 
     double getYaw(nav_msgs::Odometry position);
+
+    int8_t to_signed(int value, int bits);
 };
 
 #endif  // _BLUEPILL_COMM_HPP_
