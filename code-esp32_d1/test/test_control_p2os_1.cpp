@@ -12,8 +12,9 @@ HardwareSerial pioneer_serial(2);  // define a Serial for UART2
 P2OS*    p2os;
 uint32_t last_time_motor_state = 0;
 uint32_t current_time;
+uint32_t current_loop_time;
 
-int scale(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max) {
+int scale_test(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max) {
     return int(new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min));
 }
 
@@ -39,7 +40,10 @@ void loop() {
     geometry_msgs::Twist  msg_vel;
     p2os_msgs::MotorState msg_motor_state;
 
+    
     while (ps5.isConnected() == true) {
+        current_loop_time = millis();
+
         if (ps5.Up()) {
             is_connected = !(p2os->setup());
         }
@@ -54,7 +58,7 @@ void loop() {
 
             current_r2_val = ps5.R2Value();  // value 0 - 255
             current_l2_val = ps5.L2Value();  // value 0 - 255
-            current_rs_x_val = (-1) * scale(ps5.RStickX(), -128, 128, -100, 100);
+            current_rs_x_val = (-1) * scale_test(ps5.RStickX(), -128, 128, -170, 170);
 
             msg_vel.linear.x = double(double(current_r2_val - current_l2_val) / 100);
             msg_vel.angular.z = double(current_rs_x_val) / 100;
@@ -67,5 +71,7 @@ void loop() {
                 last_time_motor_state = current_time;
             }
         }
+
+        debug_serial.printf("current_loop_time: %ld \n",  (millis() - current_loop_time));
     }
 }

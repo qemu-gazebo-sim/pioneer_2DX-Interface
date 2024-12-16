@@ -13,8 +13,9 @@ P2OSCommunication* p2os_communication;
 uint32_t           last_time_pulse = 0;
 uint32_t           last_time_vel = 0;
 uint32_t           current_time;
+uint32_t current_loop_time;
 
-int scale(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max) {
+int scale_test(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max) {
     return int(new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min));
 }
 
@@ -38,6 +39,8 @@ void loop() {
     int16_t current_rs_x_val = 0;
 
     while (ps5.isConnected() == true) {
+        current_loop_time = millis();
+
         if (ps5.Up()) {
             is_connected = !(p2os_communication->Setup());
         }
@@ -76,7 +79,7 @@ void loop() {
                     current_l2_val = 0;
                 }
 
-                current_rs_x_val = scale(ps5.RStickX(), -128, 128, -100, 100);
+                current_rs_x_val = scale_test(ps5.RStickX(), -128, 128, -100, 100);
                 current_rs_x_val = (-1) * current_rs_x_val;
 
                 if (abs(current_rs_x_val) < 10) {
@@ -87,6 +90,9 @@ void loop() {
 
                 last_time_vel = current_time;
             }
+        
         }
+
+        debug_serial.printf("current_loop_time: %ld \n",  (millis() - current_loop_time));
     }
 }
