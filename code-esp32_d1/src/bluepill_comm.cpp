@@ -41,13 +41,14 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     pinMode(MOTOR2_COMM3, INPUT);
 
     ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
-    ::memset(this->motor_gpio_state, false, sizeof(this->motor_gpio_state));
+    ::memset(this->motor_gpio_state, 0, sizeof(this->motor_gpio_state));
 
     this->current_velocity = geometry_msgs::Twist();
     this->current_motors_speed = MotorSpeed();
 
     this->vel_sample_counter = 0;
     this->vel_time = millis();
+    // this->polling_time  = millis();
     this->connection_pin_time = millis();
 
     this->connection_pin_state = NOT_CONNECTED;
@@ -67,7 +68,11 @@ int8_t BluepillCommunication::to_signed(int value, int bits) {
 }
 
 void BluepillCommunication::loop() {
-    if (((millis() - this->vel_time) < VELOCITY_SAMPLE_INTERVAL) || (this->vel_sample_counter < 3)) {
+    if (
+            // ((millis() - this->vel_time) < VELOCITY_SAMPLE_INTERVAL)
+          (this->vel_sample_counter < 4)
+    ) {
+            for (int i = 0; i < 5; i++) {
         this->motor_sample_sum[0] += digitalRead(MOTOR1_COMM1);
         this->motor_sample_sum[1] += digitalRead(MOTOR1_COMM2);
         this->motor_sample_sum[2] += digitalRead(MOTOR1_COMM3);
@@ -75,20 +80,29 @@ void BluepillCommunication::loop() {
         this->motor_sample_sum[4] += digitalRead(MOTOR2_COMM2);
         this->motor_sample_sum[5] += digitalRead(MOTOR2_COMM3);
         this->vel_sample_counter++;
+            }
     } else {
-        this->motor_gpio_state[0] = double(this->motor_sample_sum[0] / this->vel_sample_counter) > 0.5;
-        this->motor_gpio_state[1] = double(this->motor_sample_sum[1] / this->vel_sample_counter) > 0.5;
-        this->motor_gpio_state[2] = double(this->motor_sample_sum[2] / this->vel_sample_counter) > 0.5;
-        this->motor_gpio_state[3] = double(this->motor_sample_sum[3] / this->vel_sample_counter) > 0.5;
-        this->motor_gpio_state[4] = double(this->motor_sample_sum[4] / this->vel_sample_counter) > 0.5;
-        this->motor_gpio_state[5] = double(this->motor_sample_sum[5] / this->vel_sample_counter) > 0.5;
+
+        for (int i = 0; i < NUM_MOTOR_COMMS; i++) {
+            if (this->vel_sample_counter == 0) {
+                this->motor_gpio_state[i] = 0;
+            } else {
+                this->motor_gpio_state[i] = (double(this->motor_sample_sum[i]) / this->vel_sample_counter) > 0.5;
+            }
+        }
 
         this->current_motors_speed.left = this->to_signed(
-            (this->motor_gpio_state[0] << 0) | (this->motor_gpio_state[1] << 1) | (this->motor_gpio_state[2] << 2), 3
+                (this->motor_gpio_state[0] << 0) 
+            |   (this->motor_gpio_state[1] << 1) 
+            |   (this->motor_gpio_state[2] << 2), 
+            3
         );
 
         this->current_motors_speed.right = this->to_signed(
-            (this->motor_gpio_state[3] << 0) | (this->motor_gpio_state[4] << 1) | (this->motor_gpio_state[5] << 2), 3
+            (this->motor_gpio_state[3] << 0) 
+            | (this->motor_gpio_state[4] << 1) 
+            | (this->motor_gpio_state[5] << 2), 
+            3
         );
 
         int16_t linear_vel = this->current_motors_speed.right + this->current_motors_speed.left;
@@ -187,17 +201,23 @@ void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
         int32_t values_to_read = NUM_DDS;
     }
 
-    for (int i = 0; i < values_to_read; i++) {
-        dds_gpio_state[i] = (dds_data.ranges[i] > DDS_THRESHOLD) ? LOW : HIGH;
+    for (int i = 0; i < NUM_DDS; i++) {
+        if (i < values_to_read) {
+            dds_gpio_state[i] = (dds_data.ranges[i] > 1) ? LOW : HIGH;
+        } else {
+            dds_gpio_state[i] = 0;
+        }
+        
     }
+    dds_gpio_state[0] = LOW;
 
-    digitalWrite(DDS_1, dds_gpio_state[0]);
-    digitalWrite(DDS_2, dds_gpio_state[1]);
-    digitalWrite(DDS_3, dds_gpio_state[2]);
-    digitalWrite(DDS_4, dds_gpio_state[3]);
-    digitalWrite(DDS_5, dds_gpio_state[4]);
-    digitalWrite(DDS_6, dds_gpio_state[5]);
-    digitalWrite(DDS_7, dds_gpio_state[6]);
+    digitalWrite(DDS_1, dds_gpio_state[DDS_1_POS]);
+    digitalWrite(DDS_2, dds_gpio_state[DDS_2_POS]);
+    digitalWrite(DDS_3, dds_gpio_state[DDS_3_POS]);
+    digitalWrite(DDS_4, dds_gpio_state[DDS_4_POS]);
+    digitalWrite(DDS_5, dds_gpio_state[DDS_5_POS]);
+    digitalWrite(DDS_6, dds_gpio_state[DDS_6_POS]);
+    digitalWrite(DDS_7, dds_gpio_state[DDS_7_POS]);
     // digitalWrite(DDS_8, dds_gpio_state[7]);
 }
 

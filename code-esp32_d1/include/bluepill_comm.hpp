@@ -11,6 +11,18 @@ enum ConnectionStates {
     CONNECTED
 };
 
+enum DDS_POSITIONS {
+    DDS_1_POS = 0,
+    DDS_2_POS,
+    DDS_3_POS,
+    DDS_4_POS,
+    DDS_5_POS,
+    DDS_6_POS,
+    DDS_7_POS,
+    DDS_8_POS,
+};
+
+
 struct MotorSpeed {
     int8_t left;
     int8_t right;
@@ -29,7 +41,8 @@ private:
     ConnectionStates connection_pin_state;
 
     /* Velocity params */
-    uint32_t             vel_time;
+    uint64_t             vel_time;
+    // uint32_t             polling_time;
     uint32_t             motor_sample_sum[NUM_MOTOR_COMMS];
     uint32_t             vel_sample_counter;
     bool                 motor_gpio_state[NUM_MOTOR_COMMS];
