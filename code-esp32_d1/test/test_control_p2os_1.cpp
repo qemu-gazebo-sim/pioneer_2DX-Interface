@@ -40,7 +40,6 @@ void loop() {
     geometry_msgs::Twist  msg_vel;
     p2os_msgs::MotorState msg_motor_state;
 
-    
     while (ps5.isConnected() == true) {
         current_loop_time = millis();
 
@@ -72,6 +71,6 @@ void loop() {
             }
         }
 
-        debug_serial.printf("current_loop_time: %ld \n",  (millis() - current_loop_time));
+        debug_serial.printf("current_loop_time: %ld \n", (millis() - current_loop_time));
     }
 }

@@ -13,7 +13,7 @@ P2OSCommunication* p2os_communication;
 uint32_t           last_time_pulse = 0;
 uint32_t           last_time_vel = 0;
 uint32_t           current_time;
-uint32_t current_loop_time;
+uint32_t           current_loop_time;
 
 int scale_test(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min, int16_t new_max) {
     return int(new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min));
@@ -90,9 +90,8 @@ void loop() {
 
                 last_time_vel = current_time;
             }
-        
         }
 
-        debug_serial.printf("current_loop_time: %ld \n",  (millis() - current_loop_time));
+        debug_serial.printf("current_loop_time: %ld \n", (millis() - current_loop_time));
     }
 }

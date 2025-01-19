@@ -1,119 +1,157 @@
-// #define USE_PS5_CONTROL
-
-#ifdef USE_PS5_CONTROL
-    #include <ps5Controller.h>
-    #include "utils.hpp"
-    #define PS5_CONTROLLER_MAC_ADDRESS "10:18:49:7D:EC:F1"  // replace with MAC address of your controller
-#else
-    #include "bluepill_comm.hpp"
-#endif
-
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <p2os.hpp>
+#include "bluepill_comm.hpp"
+
 #define PIONEER_SERIAL_RX 16
 #define PIONEER_SERIAL_TX 17
 
-HardwareSerial debug_serial(0);    // define a Serial for UART0
+HardwareSerial debug_serial(0);
 HardwareSerial pioneer_serial(2);  // define a Serial for UART2
 
-P2OS*    p2os;
-uint32_t last_time_motor_state = 0;
+QueueHandle_t msg_queue_vel;
+QueueHandle_t msg_queue_conn_command;
+QueueHandle_t msg_queue_sensors;
 
-#ifndef USE_PS5_CONTROL
+TaskHandle_t TaskBluepill;
+TaskHandle_t TaskP2OS;
+
+void task_bluepill_code(void* pvParameters);
+void task_p2os_code(void* pvParameters);
+
 BluepillCommunication* bluepill_comm;
-#endif
+P2OS*                  p2os;
 
 void setup() {
     debug_serial.begin(9600);
-    pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
     debug_serial.flush();
+    pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
     pioneer_serial.flush();
 
-#ifdef USE_PS5_CONTROL
-    ps5.begin(PS5_CONTROLLER_MAC_ADDRESS);
-#else
     bluepill_comm = new BluepillCommunication(debug_serial);
-#endif
-
     p2os = new P2OS(debug_serial, pioneer_serial);
+
+    msg_queue_vel = xQueueCreate(1, sizeof(geometry_msgs::Twist));
+    msg_queue_conn_command = xQueueCreate(1, sizeof(ConnectionStates));
+    msg_queue_sensors = xQueueCreate(1, sizeof(nav_msgs::ros_p2os_data_t));
+
+    int32_t size_base = 1024;
+
+    xTaskCreatePinnedToCore(task_bluepill_code, "TaskBluepill", size_base * 10, NULL, 1, &TaskBluepill, 0);
+
+    xTaskCreatePinnedToCore(task_p2os_code, "TaskP2OS", size_base * 4, NULL, 1, &TaskP2OS, 1);
+
     debug_serial.println("Ready!");
 }
 
-void loop() {
-#ifdef USE_PS5_CONTROL
-    bool     is_connected = 0;
-    uint16_t current_r2_val = 0;
-    uint16_t current_l2_val = 0;
-    int16_t  current_rs_x_val = 0;
+void task_bluepill_code(void* pvParameters) {
+    ConnectionStates          current_connected_state = NOT_CONNECTED;
+    bool                      need_send_connect_msg = false;
+    geometry_msgs::Twist      current_vel;
+    nav_msgs::ros_p2os_data_t data_from_p2os;
 
-    geometry_msgs::Twist  msg_vel;
-    p2os_msgs::MotorState msg_motor_state;
-
-    while (ps5.isConnected() == true) {
-        if (ps5.Up() && (is_connected < 1)) {
-            is_connected = !(p2os->setup());
-        }
-
-        if (ps5.Down() && (is_connected > 0)) {
-            is_connected = p2os->shutdown();
-        }
-
-        if (is_connected) {
-            p2os->loop();
-
-            current_r2_val = scale(ps5.R2Value(), 0, 255, 0, 400);  // max it is 500, but we are using 400
-            current_l2_val = scale(ps5.L2Value(), 0, 255, 0, 400);  // max it is 500, but we are using 400
-            current_rs_x_val =
-                (-1) * scale(ps5.RStickX(), -128, 128, -170, 170);  // max it is 180, but we are using 170
-
-            msg_vel.linear.x = double(double(current_r2_val - current_l2_val) / 1000);
-            msg_vel.angular.z = double(double(current_rs_x_val) / 100);
-
-            p2os->set_vel(&msg_vel);
-
-            if (millis() - last_time_motor_state > 100) {
-                msg_motor_state.state = 1;
-                p2os->set_motor_state(&msg_motor_state);
-                last_time_motor_state = millis();
-            }
-        }
-    }
-#else
-    geometry_msgs::Twist  current_vel;
-    p2os_msgs::MotorState msg_motor_state;
-    ConnectionStates      current_connected_state = NOT_CONNECTED;
+    uint32_t connection_time = millis();
+    uint32_t current_loop_time_bluepill;
 
     while (true) {
+        current_loop_time_bluepill = millis();
         bluepill_comm->loop();
 
-        if (current_connected_state != bluepill_comm->is_bluepill_connected()) {
+        if (current_connected_state != bluepill_comm->is_bluepill_connected() &&
+            ((millis() - connection_time) > 1000)) {
             switch (bluepill_comm->is_bluepill_connected()) {
                 case CONNECTED:
-                    current_connected_state = !(p2os->setup()) ? CONNECTED : NOT_CONNECTED;
+                    current_connected_state = CONNECTED;
+                    need_send_connect_msg = true;
                     break;
                 case NOT_CONNECTED:
-                    current_connected_state = p2os->shutdown() ? NOT_CONNECTED : CONNECTED;
+                    current_connected_state = NOT_CONNECTED;
+                    need_send_connect_msg = true;
                     break;
                 default:
-                    debug_serial.println("Error: Cry! - switch (bluepill_comm->is_bluepill_connected())");
+                    current_connected_state = CONNECTED;
+                    // debug_serial.println("Error: Cry! - switch (bluepill_comm->is_bluepill_connected())");
                     break;
+            }
+
+            if (need_send_connect_msg && msg_queue_conn_command != 0) {
+                if (xQueueSend(msg_queue_conn_command, &current_connected_state, portMAX_DELAY) == pdTRUE) {
+                    need_send_connect_msg = false;
+                }
             }
 
             bluepill_comm->send_bluepill_connection(current_connected_state);
         }
 
-        if (current_connected_state == CONNECTED) {
+        current_vel = bluepill_comm->get_velocity();
+
+        if (xQueueOverwrite(msg_queue_vel, &current_vel) == pdFALSE) {
+            debug_serial.println("BP: Failed to send the data");
+        }
+
+        if (msg_queue_sensors != 0) {
+            if (xQueueReceive(msg_queue_sensors, &data_from_p2os, (1 / portTICK_PERIOD_MS)) == pdTRUE) {
+                bluepill_comm->update_p2dx_data(data_from_p2os);
+            }
+        }
+
+        // vTaskDelay(10 / portTICK_PERIOD_MS);
+        // debug_serial.printf("BP: current_loop_time: %ld \n",  (millis() - current_loop_time_bluepill));
+    }
+}
+
+void task_p2os_code(void* pvParameters) {
+    nav_msgs::ros_p2os_data_t msg_p2os_sensors;
+
+    bool                  is_connected_p2os = false;
+    uint32_t              current_loop_time_p2os;
+    uint32_t              last_time_motor_state = 0;
+    ConnectionStates      connection_command_p2os;
+    geometry_msgs::Twist  msg_p2os_vel;
+    p2os_msgs::MotorState msg_motor_state;
+
+    double x_val = 0;
+    while (true) {
+        current_loop_time_p2os = millis();
+
+        if (msg_queue_conn_command != 0) {
+            if (xQueueReceive(msg_queue_conn_command, &connection_command_p2os, 0) == pdTRUE) {
+                if (!(connection_command_p2os == is_connected_p2os)) {
+                    if (connection_command_p2os == CONNECTED) {
+                        is_connected_p2os = !(p2os->setup());
+                        is_connected_p2os = true;
+                        debug_serial.printf("P2OS: setup! \n");
+                    } else if (connection_command_p2os == NOT_CONNECTED) {
+                        is_connected_p2os = p2os->shutdown();
+                        debug_serial.printf("P2OS: shutdown! \n");
+                    }
+                }
+            }
+        }
+
+        if (is_connected_p2os) {
             p2os->loop();
-            current_vel = bluepill_comm->get_velocity();
-            p2os->set_vel(&current_vel);
+
+            if (msg_queue_vel != 0) {
+                if (xQueueReceive(msg_queue_vel, &msg_p2os_vel, (10 / portTICK_PERIOD_MS)) == pdTRUE) {
+                    p2os->set_vel(&msg_p2os_vel);
+                }
+            }
+
+            msg_p2os_sensors = p2os->get_p2dx_data();
+            if (xQueueOverwrite(msg_queue_sensors, &msg_p2os_sensors) == pdFALSE) {
+                debug_serial.println("P2OS: Failed to send the  sensors P2OS data");
+            }
+
             if (millis() - last_time_motor_state > 100) {
                 msg_motor_state.state = 1;
                 p2os->set_motor_state(&msg_motor_state);
                 last_time_motor_state = millis();
             }
-            bluepill_comm->update_p2dx_data(p2os->get_p2dx_data());
         }
+
+        // debug_serial.printf("P2OS: current_loop_time: %ld \n",  (millis() - current_loop_time_p2os));
     }
-#endif
 }
+
+void loop() { }

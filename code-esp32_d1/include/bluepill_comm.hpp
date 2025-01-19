@@ -22,7 +22,6 @@ enum DDS_POSITIONS {
     DDS_8_POS,
 };
 
-
 struct MotorSpeed {
     int8_t left;
     int8_t right;
@@ -41,7 +40,7 @@ private:
     ConnectionStates connection_pin_state;
 
     /* Velocity params */
-    uint64_t             vel_time;
+    uint64_t vel_time;
     // uint32_t             polling_time;
     uint32_t             motor_sample_sum[NUM_MOTOR_COMMS];
     uint32_t             vel_sample_counter;
