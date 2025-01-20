@@ -1,3 +1,6 @@
 [submodule "ps5-esp32"]
 	path = code-esp32_d1/lib/ps5-esp32
 	url = git@github.com:rodneybakiskan/ps5-esp32.git
+[submodule "p2os-arduino"]
+	path = code-esp32_d1/lib/p2os-arduino
+	url = git@github.com:qemu-gazebo-sim/p2os-arduino.git
