@@ -1,4 +1,5 @@
 library/**
+*.ms14 (Security copy)
 
 # ---> Altium
 # Created by https://www.gitignore.io/api/altium
