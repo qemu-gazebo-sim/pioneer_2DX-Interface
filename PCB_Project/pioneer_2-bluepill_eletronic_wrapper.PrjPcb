@@ -101,7 +101,7 @@ GenerateClassCluster=0
 DocumentUniqueId=GZKMJSHG
 
 [Document4]
-DocumentPath=..\..\..\remove_later\d_hospital_electronic_modules\Libraries\pioneer_2-bluepill_eletronic_wrapper.SchLib
+DocumentPath=pioneer_2-bluepill_eletronic_wrapper.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -151,8 +151,199 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=ZGDXCPXI
 
+[Document7]
+DocumentPath=pioneer_2-bluepill_eletronic_wrapper_gerber.Cam
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[Document8]
+DocumentPath=pioneer_2-bluepill_eletronic_wrapper_drills.Cam
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[Document9]
+DocumentPath=pioneer_2-bluepill_eletronic_wrapper.OutJob
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
 [GeneratedDocument1]
 DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\Design Rule Check - pioneer_2-bluepill_eletronic_wrapper.html
+DItemRevisionGUID=
+
+[GeneratedDocument2]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper.DRR
+DItemRevisionGUID=
+
+[GeneratedDocument3]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper.EXTREP
+DItemRevisionGUID=
+
+[GeneratedDocument4]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper.LDP
+DItemRevisionGUID=
+
+[GeneratedDocument5]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper.REP
+DItemRevisionGUID=
+
+[GeneratedDocument6]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper.RUL
+DItemRevisionGUID=
+
+[GeneratedDocument7]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper.TXT
+DItemRevisionGUID=
+
+[GeneratedDocument8]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Bottom_3D_Body.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument9]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Bottom_Assembly.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument10]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Bottom_Courtyard.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument11]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Bottom_Designator.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument12]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Copper_Signal_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument13]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Copper_Signal_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument14]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Drawing_1.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument15]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Drillmap_1.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument16]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Keep-out.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument17]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Legend_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument18]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Legend_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument19]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Mechanical_1.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument20]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Mechanical_4.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument21]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Mechanical_13.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument22]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Mechanical_15.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument23]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Mechanical_29.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument24]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Other.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument25]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Other_1.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument26]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Pads_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument27]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Pads_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument28]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Paste_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument29]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Paste_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument30]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Profile.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument31]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Soldermask_Bot.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument32]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Soldermask_Top.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument33]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Top_3D_Body.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument34]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Top_Assembly.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument35]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Top_Courtyard.gbr
+DItemRevisionGUID=
+
+[GeneratedDocument36]
+DocumentPath=Project Outputs for pioneer_2-bluepill_eletronic_wrapper\pioneer_2-bluepill_eletronic_wrapper_Top_Designator.gbr
 DItemRevisionGUID=
 
 [Configuration1]
@@ -171,7 +362,7 @@ AutoOpenOutJob=-1
 
 [Generic_SmartPDFSettings]
 ProjectMode=-1
-ZoomPrecision=50
+ZoomPrecision=59
 AddNetsInformation=-1
 AddNetPins=-1
 AddNetNetLabels=-1
