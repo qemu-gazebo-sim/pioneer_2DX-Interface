@@ -20,7 +20,7 @@ void setup() {
 
 void loop() {
     bluepill_comm->loop();
-
+    bluepill_comm->send_bluepill_connection(CONNECTED);
     if ((millis() - print_time) > 500) {
         geometry_msgs::Twist current_vel = bluepill_comm->get_velocity();
         MotorSpeed           current_motors_speed = bluepill_comm->get_each_motor_speed();

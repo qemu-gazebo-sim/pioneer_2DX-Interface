@@ -91,7 +91,8 @@ void task_bluetooth_code(void* pvParameters) {
                 }
             }
 
-            debug_serial.printf("BT: current_loop_time: %ld \n", (millis() - current_loop_time_bt));
+            // debug_serial.printf("BT: current_loop_time: %ld \n", (millis() - current_loop_time_bt));
+            vTaskDelay(1 / portTICK_PERIOD_MS);
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -145,7 +146,7 @@ void task_p2os_code(void* pvParameters) {
             }
         }
 
-        debug_serial.printf("P2OS: current_loop_time: %ld \n", (millis() - current_loop_time_p2os));
+        // debug_serial.printf("P2OS: current_loop_time: %ld \n", (millis() - current_loop_time_p2os));
     }
 }
 
