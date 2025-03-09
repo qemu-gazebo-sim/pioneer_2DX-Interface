@@ -1,15 +1,14 @@
-#include "bluepill_config.hpp"
+#include "pinout_config.hpp"
 #include <Arduino.h>
 #include <bluepill_comm.hpp>
 #include "utils.hpp"
+#include <ArduinoLog.h>
 
-BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
-    this->debug_serial = &debug_serial;
-
+BluepillCommunication::BluepillCommunication() {
     /* Connection pin settings */
     pinMode(P2DX_CON, INPUT);
     pinMode(P2DX_CON_2, OUTPUT);
-    pinMode(LED_CONN, OUTPUT);
+    // pinMode(LED_CONN, OUTPUT);
 
     /* Encoders settings */
     pinMode(ENCODER1_S1, OUTPUT);
@@ -27,7 +26,7 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     pinMode(DDS_4, OUTPUT);
     pinMode(DDS_5, OUTPUT);
     pinMode(DDS_6, OUTPUT);
-    pinMode(DDS_7, OUTPUT);
+    // pinMode(DDS_7, OUTPUT);
     // pinMode(DDS_8, OUTPUT);
     this->current_ultrasonic_data = p2os_msgs::SonarArray();
     ::memset(this->dds_gpio_state, LOW, sizeof(this->dds_gpio_state));
@@ -36,9 +35,11 @@ BluepillCommunication::BluepillCommunication(HardwareSerial& debug_serial) {
     pinMode(MOTOR1_COMM1, INPUT);
     pinMode(MOTOR1_COMM2, INPUT);
     pinMode(MOTOR1_COMM3, INPUT);
+
     pinMode(MOTOR2_COMM1, INPUT);
     pinMode(MOTOR2_COMM2, INPUT);
     pinMode(MOTOR2_COMM3, INPUT);
+    // pinMode(MOTOR2_COMM4, INPUT);
 
     ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
     ::memset(this->motor_gpio_state, 0, sizeof(this->motor_gpio_state));
@@ -82,7 +83,6 @@ void BluepillCommunication::loop() {
         this->vel_sample_counter++;
             }
     } else {
-
         for (int i = 0; i < NUM_MOTOR_COMMS; i++) {
             if (this->vel_sample_counter == 0) {
                 this->motor_gpio_state[i] = 0;
@@ -92,27 +92,21 @@ void BluepillCommunication::loop() {
         }
 
         this->current_motors_speed.left = this->to_signed(
-                (this->motor_gpio_state[0] << 0) 
-            |   (this->motor_gpio_state[1] << 1) 
-            |   (this->motor_gpio_state[2] << 2), 
-            3
+            (this->motor_gpio_state[0] << 0) | (this->motor_gpio_state[1] << 1) | (this->motor_gpio_state[2] << 2), 3
         );
 
         this->current_motors_speed.right = this->to_signed(
-            (this->motor_gpio_state[3] << 0) 
-            | (this->motor_gpio_state[4] << 1) 
-            | (this->motor_gpio_state[5] << 2), 
-            3
+            (this->motor_gpio_state[3] << 0) | (this->motor_gpio_state[4] << 1) | (this->motor_gpio_state[5] << 2), 3
         );
 
         int16_t linear_vel = this->current_motors_speed.right + this->current_motors_speed.left;
-        linear_vel = scale(linear_vel, -8, 8, -800, 800) / 2;  // scale(linear_vel, -4, 4, -400, 400);
+        linear_vel = scale(linear_vel, -8, 8, -500, 500) / 2;  // scale(linear_vel, -4, 4, -400, 400);
 
         int16_t angular_vel = this->current_motors_speed.right - this->current_motors_speed.left;
         angular_vel = scale(angular_vel, -8, 8, -340, 340) / 2;  // scale(angular_vel, -4, 4, -170, 170);
 
-        this->current_velocity.linear.x = double(linear_vel);
-        this->current_velocity.angular.z = double(angular_vel);
+        this->current_velocity.linear.x = double(linear_vel / 1e3);
+        this->current_velocity.angular.z = double(angular_vel / 1e3);
 
         ::memset(this->motor_sample_sum, 0, sizeof(this->motor_sample_sum));
         this->vel_sample_counter = 0;
@@ -189,15 +183,11 @@ void BluepillCommunication::update_encoder_data(nav_msgs::Odometry position) {
 void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
     int32_t values_to_read = dds_data.ranges_count;
     if (dds_data.ranges_count < NUM_DDS) {
-#ifdef BLUEPILL_INFO_PRINT
-        this->debug_serial->println("Info: BluepillCommunication:update_dds_data range count smaller than 8");
-#endif
+        Log.infoln("BluepillCommunication:update_dds_data range count smaller than 8");
     }
 
     if (dds_data.ranges_count > NUM_DDS) {
-#ifdef BLUEPILL_INFO_PRINT
-        this->debug_serial->println("Info: BluepillCommunication:update_dds_data range count bigger than 8");
-#endif
+        Log.infoln("BluepillCommunication:update_dds_data range count bigger than 8");
         int32_t values_to_read = NUM_DDS;
     }
 
@@ -207,7 +197,6 @@ void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
         } else {
             dds_gpio_state[i] = 0;
         }
-        
     }
     dds_gpio_state[0] = LOW;
 
@@ -217,7 +206,7 @@ void BluepillCommunication::update_dds_data(p2os_msgs::SonarArray dds_data) {
     digitalWrite(DDS_4, dds_gpio_state[DDS_4_POS]);
     digitalWrite(DDS_5, dds_gpio_state[DDS_5_POS]);
     digitalWrite(DDS_6, dds_gpio_state[DDS_6_POS]);
-    digitalWrite(DDS_7, dds_gpio_state[DDS_7_POS]);
+    // digitalWrite(DDS_7, dds_gpio_state[DDS_7_POS]);
     // digitalWrite(DDS_8, dds_gpio_state[7]);
 }
 

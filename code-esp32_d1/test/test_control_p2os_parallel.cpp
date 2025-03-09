@@ -2,9 +2,7 @@
 #include <Arduino.h>
 #include <p2os.hpp>
 #include <HardwareSerial.h>
-
-#define PIONEER_SERIAL_RX 16
-#define PIONEER_SERIAL_TX 17
+#include <ArduinoLog.h>
 
 HardwareSerial debug_serial(0);    // define a Serial for UART0
 HardwareSerial pioneer_serial(2);  // define a Serial for UART2
@@ -32,6 +30,7 @@ void setup() {
     debug_serial.flush();
     // xSemaphore = xSemaphoreCreateBinary();
 
+    Log.begin(LOG_LEVEL_INFO, &debug_serial);
     msg_queue_vel = xQueueCreate(1, sizeof(geometry_msgs::Twist));
     msg_queue_conn_command = xQueueCreate(1, sizeof(BTConnectionStates));
 
@@ -41,7 +40,7 @@ void setup() {
 
     xTaskCreatePinnedToCore(task_p2os_code, "TaskP2OS", size_base * 4, NULL, 1, &TaskP2OS, 1);
 
-    debug_serial.println("Ready!");
+    Log.infoln("Ready!");
 }
 
 void task_bluetooth_code(void* pvParameters) {
@@ -51,8 +50,8 @@ void task_bluetooth_code(void* pvParameters) {
 
     while (true) {
         BTConnectionStates is_connected_bt = NOT_CONNECTED;
-        uint8_t            current_r2_val = 0;
-        uint8_t            current_l2_val = 0;
+        uint16_t           current_r2_val = 0;
+        uint16_t           current_l2_val = 0;
         int16_t            current_rs_x_val = 0;
 
         BTConnectionStates connection_command;
@@ -79,19 +78,19 @@ void task_bluetooth_code(void* pvParameters) {
             }
 
             if (is_connected_bt == CONNECTED) {
-                current_r2_val = ps5.R2Value();  // value 0 - 255
-                current_l2_val = ps5.L2Value();  // value 0 - 255
+                current_r2_val = scale_test(ps5.R2Value(), 0, 255, 0, 500);
+                current_l2_val = scale_test(ps5.L2Value(), 0, 255, 0, 500);
                 current_rs_x_val = (-1) * scale_test(ps5.RStickX(), -128, 128, -170, 170);
 
-                msg_vel.linear.x = double(double(current_r2_val - current_l2_val) / 100);
+                msg_vel.linear.x = double(double(current_r2_val - current_l2_val) / 1000);
                 msg_vel.angular.z = double(current_rs_x_val) / 100;
 
                 if (xQueueOverwrite(msg_queue_vel, &msg_vel) == pdFALSE) {
-                    debug_serial.println("Failed to send the data");
+                    Log.infoln("Failed to send the data");
                 }
             }
 
-            // debug_serial.printf("BT: current_loop_time: %ld \n", (millis() - current_loop_time_bt));
+            Log.verboseln("BT: current_loop_time: %l", (millis() - current_loop_time_bt));
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
 
@@ -100,9 +99,7 @@ void task_bluetooth_code(void* pvParameters) {
 }
 
 void task_p2os_code(void* pvParameters) {
-    pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
-    pioneer_serial.flush();
-    P2OS* p2os = new P2OS(debug_serial, pioneer_serial);
+    P2OS* p2os = new P2OS(pioneer_serial);
 
     bool                  is_connected_p2os = false;
     uint32_t              current_loop_time_p2os;
@@ -121,10 +118,10 @@ void task_p2os_code(void* pvParameters) {
                     if (connection_command_p2os == CONNECTED) {
                         is_connected_p2os = !(p2os->setup());
                         is_connected_p2os = true;
-                        debug_serial.printf("P2OS: setup! \n");
+                        Log.infoln("P2OS: setup!");
                     } else if (connection_command_p2os == NOT_CONNECTED) {
                         is_connected_p2os = p2os->shutdown();
-                        debug_serial.printf("P2OS: shutdown! \n");
+                        Log.infoln("P2OS: shutdown!");
                     }
                 }
             }
@@ -146,7 +143,7 @@ void task_p2os_code(void* pvParameters) {
             }
         }
 
-        // debug_serial.printf("P2OS: current_loop_time: %ld \n", (millis() - current_loop_time_p2os));
+        Log.verboseln("P2OS: current_loop_time: %l", (millis() - current_loop_time_p2os));
     }
 }
 

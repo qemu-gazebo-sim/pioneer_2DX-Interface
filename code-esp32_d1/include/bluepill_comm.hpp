@@ -2,7 +2,7 @@
 #define _BLUEPILL_COMM_HPP_
 
 #include "p2os_msgs.hpp"
-#include "bluepill_config.hpp"
+#include "pinout_config.hpp"
 #include <Arduino.h>
 #include <HardwareSerial.h>
 
@@ -31,8 +31,6 @@ class BluepillCommunication {
     // variables
 
 private:
-    HardwareSerial* debug_serial;
-
     /* Connection params */
     uint32_t         connection_pin_time;
     uint32_t         connection_pin_sample_sum;
@@ -59,7 +57,7 @@ private:
     // functions
 
 public:
-    BluepillCommunication(HardwareSerial& debug_serial);
+    BluepillCommunication();
 
     ~BluepillCommunication();
 

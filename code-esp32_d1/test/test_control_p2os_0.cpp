@@ -2,9 +2,7 @@
 #include <Arduino.h>
 #include <p2os_comm.hpp>
 #include <HardwareSerial.h>
-
-#define PIONEER_SERIAL_RX 16
-#define PIONEER_SERIAL_TX 17
+#include <ArduinoLog.h>
 
 HardwareSerial debug_serial(0);    // define a Serial for UART0
 HardwareSerial pioneer_serial(2);  // define a Serial for UART2
@@ -21,11 +19,10 @@ int scale_test(int16_t value, int16_t old_min, int16_t old_max, int16_t new_min,
 
 void setup() {
     debug_serial.begin(9600);
-    pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
     debug_serial.flush();
-    pioneer_serial.flush();
 
-    p2os_communication = new P2OSCommunication(debug_serial, pioneer_serial);
+    Log.begin(LOG_LEVEL_INFO, &debug_serial);
+    p2os_communication = new P2OSCommunication(pioneer_serial);
 
     ps5.begin("10:18:49:7D:EC:F1");  // replace with MAC address of your controller
 

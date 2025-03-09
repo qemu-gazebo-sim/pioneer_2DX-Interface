@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include "bluepill_comm.hpp"
+#include <ArduinoLog.h>
 
 HardwareSerial             debug_serial(0);
 BluepillCommunication*     bluepill_comm;
@@ -11,7 +12,9 @@ void setup() {
     debug_serial.begin(9600);
     debug_serial.flush();
 
-    bluepill_comm = new BluepillCommunication(debug_serial);
+    Log.begin(LOG_LEVEL_INFO, &debug_serial);
+
+    bluepill_comm = new BluepillCommunication();
     mock_p2os_data = new nav_msgs::ros_p2os_data_t();
 
     debug_serial.println("Ready!");

@@ -1,10 +1,7 @@
-#include <Arduino.h>
 #include <HardwareSerial.h>
 #include <p2os.hpp>
 #include "bluepill_comm.hpp"
-
-#define PIONEER_SERIAL_RX 16
-#define PIONEER_SERIAL_TX 17
+#include <ArduinoLog.h>
 
 HardwareSerial debug_serial(0);
 HardwareSerial pioneer_serial(2);  // define a Serial for UART2
@@ -25,11 +22,11 @@ P2OS*                  p2os;
 void setup() {
     debug_serial.begin(9600);
     debug_serial.flush();
-    pioneer_serial.begin(9600, SERIAL_8N1, PIONEER_SERIAL_RX, PIONEER_SERIAL_TX);
-    pioneer_serial.flush();
 
-    bluepill_comm = new BluepillCommunication(debug_serial);
-    p2os = new P2OS(debug_serial, pioneer_serial);
+    Log.begin(LOG_LEVEL_INFO, &debug_serial);
+
+    bluepill_comm = new BluepillCommunication();
+    p2os = new P2OS(pioneer_serial);
 
     msg_queue_vel = xQueueCreate(1, sizeof(geometry_msgs::Twist));
     msg_queue_conn_command = xQueueCreate(1, sizeof(ConnectionStates));
@@ -41,7 +38,7 @@ void setup() {
 
     xTaskCreatePinnedToCore(task_p2os_code, "TaskP2OS", size_base * 4, NULL, 1, &TaskP2OS, 1);
 
-    debug_serial.println("Ready!");
+    Log.infoln("Ready!");
 }
 
 void task_bluepill_code(void* pvParameters) {
@@ -70,7 +67,7 @@ void task_bluepill_code(void* pvParameters) {
                     break;
                 default:
                     current_connected_state = CONNECTED;
-                    // debug_serial.println("Error: Cry! - switch (bluepill_comm->is_bluepill_connected())");
+                    // Log.infoln("Error: Cry! - switch (bluepill_comm->is_bluepill_connected())");
                     break;
             }
 
@@ -86,7 +83,7 @@ void task_bluepill_code(void* pvParameters) {
         current_vel = bluepill_comm->get_velocity();
 
         if (xQueueOverwrite(msg_queue_vel, &current_vel) == pdFALSE) {
-            debug_serial.println("BP: Failed to send the data");
+            Log.infoln("BP: Failed to send the data");
         }
 
         if (msg_queue_sensors != 0) {
@@ -96,7 +93,7 @@ void task_bluepill_code(void* pvParameters) {
         }
 
         // vTaskDelay(10 / portTICK_PERIOD_MS);
-        // debug_serial.printf("BP: current_loop_time: %ld \n",  (millis() - current_loop_time_bluepill));
+        // Log.infoln("BP: current_loop_time: %ld",  (millis() - current_loop_time_bluepill));
     }
 }
 
@@ -120,10 +117,10 @@ void task_p2os_code(void* pvParameters) {
                     if (connection_command_p2os == CONNECTED) {
                         is_connected_p2os = !(p2os->setup());
                         is_connected_p2os = true;
-                        debug_serial.printf("P2OS: setup! \n");
+                        Log.infoln("P2OS: setup!");
                     } else if (connection_command_p2os == NOT_CONNECTED) {
                         is_connected_p2os = p2os->shutdown();
-                        debug_serial.printf("P2OS: shutdown! \n");
+                        Log.infoln("P2OS: shutdown!");
                     }
                 }
             }
@@ -150,7 +147,7 @@ void task_p2os_code(void* pvParameters) {
             }
         }
 
-        // debug_serial.printf("P2OS: current_loop_time: %ld \n",  (millis() - current_loop_time_p2os));
+        // Log.infoln("P2OS: current_loop_time: %ld",  (millis() - current_loop_time_p2os));
     }
 }
 
