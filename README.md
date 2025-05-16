@@ -2,7 +2,7 @@
 <h1 align="center">🤝 Pioneer 2 - Interface | Electronic MVP</h1>
 <p align="center"> Electronic Module for the connection between pioneer 2 and Esp32</p>
 
-![boards](./docs/diagramas-boards.drawio.png)
+ <!-- ![boards](./docs/diagramas-boards.drawio.png) -->
 
 ## 🌎 Real board in the robot
 
